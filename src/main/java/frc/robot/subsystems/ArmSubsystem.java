@@ -7,10 +7,7 @@ import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
-import com.ctre.phoenix6.signals.GravityTypeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
+import com.ctre.phoenix6.signals.*;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
@@ -27,8 +24,8 @@ public class ArmSubsystem extends SubsystemBase {
 	private SysIdRoutine routine;
 
 	public ArmSubsystem() {
-		motor = new TalonFX(MOTOR_ID, "drivebase");
-		canCoder = new CANcoder(CANCODER_ID, "drivebase");
+		motor = new TalonFX(MOTOR_ID, "rio");
+		canCoder = new CANcoder(CANCODER_ID, "rio");
 
 		Slot0Configs slotConfigs = new Slot0Configs();
 		slotConfigs.GravityType = GravityTypeValue.Arm_Cosine;
@@ -46,6 +43,7 @@ public class ArmSubsystem extends SubsystemBase {
 		mConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.SyncCANcoder;
 		mConfig.Feedback.RotorToSensorRatio = GEAR_RATIO;
 		mConfig.Feedback.SensorToMechanismRatio = 1.0;
+		mConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
 		mConfig.CurrentLimits.SupplyCurrentLimit = CURRENT_LIMIT.in(Units.Amps);
 		motor.getConfigurator().apply(mConfig);
