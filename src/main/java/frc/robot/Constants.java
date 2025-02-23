@@ -30,5 +30,8 @@ public class Constants {
 		public static final int MASTER_MOTOR_ID = 12;
 		public static final int SLAVE_MOTOR_ID = 13;
 		public static final int CANCODER_ID = 0;
+
+		public static final double MOTOR_TO_SENSOR = 4.0;
+		public static final double SENSOR_TO_MECHANISM = 3.0;
 	}
 }
