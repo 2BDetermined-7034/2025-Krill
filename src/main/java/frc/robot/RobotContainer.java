@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 
+import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.OuttakeCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -74,8 +76,8 @@ public class RobotContainer {
 		joystick.circle().onTrue(arm.setPositionCommand(Degrees.of(30.0)));
 		joystick.cross().onTrue(arm.coastOutCommand());
 
-		// reset the field-centric heading on left bumper press
-		//joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+		joystick.R2().whileTrue(new IntakeCommand(arm));
+		joystick.L2().whileTrue(new OuttakeCommand(arm));
 
 		drivetrain.registerTelemetry(logger::telemeterize);
 	}
