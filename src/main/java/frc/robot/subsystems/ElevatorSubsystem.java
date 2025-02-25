@@ -1,7 +1,12 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.SignalLogger;
-import com.ctre.phoenix6.configs.*;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.Slot1Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -10,18 +15,12 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
-import java.util.Set;
 
 import static edu.wpi.first.units.Units.*;
-import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.Elevator.*;
 
 public class ElevatorSubsystem extends SubsystemBase {
-	private final SysIdRoutine routine;
 	private final TalonFX masterMotor, slaveMotor;
 	private final CANcoder canCoder;
 	private VoltageOut voltageControl;
@@ -36,16 +35,32 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 		TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();
 
-		Slot0Configs motorConfig = talonFXConfigs.Slot0;
-		motorConfig.GravityType = GravityTypeValue.Elevator_Static;
-		motorConfig.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
-		motorConfig.kS = 0.4;
-		motorConfig.kV = 1.2;
-		motorConfig.kA = 0.2;
-		motorConfig.kG = 0.45;
-		motorConfig.kP = 0.0;
-		motorConfig.kI = 0.0;
-		motorConfig.kD = 0.0;
+		CurrentLimitsConfigs currentLimitsConfigs = talonFXConfigs.CurrentLimits;
+		currentLimitsConfigs.SupplyCurrentLimit = CURRENT_LIMIT.in(Amps);
+		currentLimitsConfigs.StatorCurrentLimitEnable = true;
+
+		Slot0Configs slot0Config = talonFXConfigs.Slot0;
+		slot0Config.GravityType = GravityTypeValue.Elevator_Static;
+		slot0Config.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
+		slot0Config.kS = 0.38;
+		slot0Config.kV = 0.45;
+		slot0Config.kA = 0.0;
+		slot0Config.kG = 0.65;
+		slot0Config.kP = 8;
+		slot0Config.kI = 0.0;
+		slot0Config.kD = 1.5;
+
+		Slot1Configs slot1Config = talonFXConfigs.Slot1;
+		slot1Config.GravityType = GravityTypeValue.Elevator_Static;
+		slot1Config.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
+		slot1Config.kS = 0.38;
+		slot1Config.kV = 0.3;
+		slot1Config.kA = 0.0;
+		slot1Config.kG = 0.65;
+		slot1Config.kP = 5;
+		slot1Config.kI = 0.0;
+		slot1Config.kD = 1;
+
 
 		MotorOutputConfigs moConfig = talonFXConfigs.MotorOutput;
 		moConfig.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -53,14 +68,14 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 		FeedbackConfigs ffConfig = talonFXConfigs.Feedback;;
 		ffConfig.FeedbackRemoteSensorID = CANCODER_ID;
-		ffConfig.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+		ffConfig.FeedbackSensorSource = FeedbackSensorSourceValue.SyncCANcoder;
 		ffConfig.RotorToSensorRatio = MOTOR_TO_SENSOR;
 		ffConfig.SensorToMechanismRatio = SENSOR_TO_MECHANISM;
 		ffConfig.FeedbackRotorOffset = 0.0;
 
 		var motionMagicConfigs = talonFXConfigs.MotionMagic;
 		motionMagicConfigs.MotionMagicCruiseVelocity = 6;
-		motionMagicConfigs.MotionMagicAcceleration = 15;
+		motionMagicConfigs.MotionMagicAcceleration = 12;
 //		motionMagicConfis.MotionMagicJerk = 0;
 
 		masterMotor.getConfigurator().apply(talonFXConfigs);
@@ -71,33 +86,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 		var ccConfig = new CANcoderConfiguration();
 		ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-		ccConfig.MagnetSensor.MagnetOffset = -0.060546875;
+		ccConfig.MagnetSensor.MagnetOffset = -0.186767578125;
 		canCoder.getConfigurator().apply(ccConfig);
-
-		var rampRate = Volts.of(1.0).div(Seconds.of(1));
-		routine = new SysIdRoutine(
-			new SysIdRoutine.Config(
-				rampRate,
-				Volts.of(4.0),
-				Seconds.of(10),
-				(state) -> {
-					SignalLogger.writeString("Elevator state", state.toString());
-				}
-			),
-			new SysIdRoutine.Mechanism(
-				(volts) -> {
-					masterMotor.setControl(new VoltageOut(volts));
-				},
-				null,
-//				(log) -> {
-//					log.motor("elevator")
-//						.voltage(masterMotor.getMotorVoltage().getValue())
-//						.angularPosition(masterMotor.getPosition().getValue())
-//						.angularVelocity(masterMotor.getVelocity().getValue());
-//				},
-				this
-			)
-		);
 
 		forwardMotionMagic = new MotionMagicVoltage(0).withSlot(0);
 		reverseMotionMagic = new MotionMagicVoltage(0).withSlot(1);
@@ -106,49 +96,32 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		SmartDashboard.putNumber("Elevator Angle Rotations", getElevatorAngle().in(Rotations));
-		SmartDashboard.putNumber("Elevator Angle Degrees", getElevatorAngle().in(Degrees));
-		SmartDashboard.putNumber("Elevator Distance Meters", getElevatorPosition().in(Meters));
+//		SmartDashboard.putNumber("Elevator Angle Rotations", getElevatorAngle().in(Rotations));
+//		SmartDashboard.putNumber("Elevator Angle Degrees", getElevatorAngle().in(Degrees));
+//		SmartDashboard.putNumber("Elevator Distance Meters", getElevatorPosition().in(Meters));
 	}
 
-	public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-		return routine.quasistatic(direction).until(
-			() -> direction.equals(SysIdRoutine.Direction.kForward)
-				? getElevatorPosition().gt(Meters.of(0.8))
-				: getElevatorPosition().lt(Meters.of(0.1))
-		);
-	}
-
-	public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-		return routine.dynamic(direction).until(
-			() -> direction.equals(SysIdRoutine.Direction.kForward)
-				? getElevatorPosition().gt(Meters.of(0.8))
-				: getElevatorPosition().lt(Meters.of(0.1))
-		);
-	}
 
 	public Angle getElevatorAngle() {
 		return masterMotor.getPosition().getValue();
 	}
 
-	public Distance getElevatorPosition() {
+	public Distance getElevatorDistance() {
 		return SPOOL_RADIUS.times(getElevatorAngle().in(Radians));
 	}
 
 	/**
-	 * Needs to be deferred
-	 * @param angle
-	 * @return
+	 *
+	 * @param angle angle setpoint of the elevator
+	 * @return the command
 	 */
 	public Command setElevatorPosition(Angle angle) {
 
 		return new FunctionalCommand(
 			() -> {
-				MotionMagicVoltage motionMagicVoltage;
-				Angle currentPosition = getElevatorAngle();
-				if(currentPosition.gt(angle)) motionMagicVoltage = reverseMotionMagic.withPosition(angle);
-				else motionMagicVoltage = forwardMotionMagic.withPosition(angle);
-				masterMotor.setControl(motionMagicVoltage);
+				masterMotor.setControl(getElevatorAngle().lt(angle)
+					? forwardMotionMagic.withPosition(angle)
+					: reverseMotionMagic.withPosition(angle));
 			},
 			() -> {},
 			(interrupted) -> {},

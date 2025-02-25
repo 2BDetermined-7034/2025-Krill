@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.OuttakeCommand;
 import frc.robot.generated.TunerConstants;
@@ -22,8 +21,8 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
 
 public class RobotContainer {
-	private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-	private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+	private final double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+	private final double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
 	/* Setting up bindings for necessary control of the swerve drive platform */
 	private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -64,16 +63,15 @@ public class RobotContainer {
             point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         ));*/
 
-		joystick.povUp().and(joystick.circle()).whileTrue(elevator.sysIdDynamic(SysIdRoutine.Direction.kForward));
-		joystick.povDown().and(joystick.circle()).whileTrue(elevator.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-		joystick.povUp().and(joystick.square()).whileTrue(elevator.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-		joystick.povDown().and(joystick.square()).whileTrue(elevator.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
 
 //		joystick.circle().onTrue(arm.setPositionCommand(Degrees.of(30.0)));
 //		joystick.cross().onTrue(arm.coastOutCommand());
 
 		joystick.R2().whileTrue(new IntakeCommand(arm));
 		joystick.L2().whileTrue(new OuttakeCommand(arm));
+
+		joystick.triangle().onTrue(elevator.setElevatorPosition(Rotations.of(1.5)));
+		joystick.square().onTrue(elevator.setElevatorPosition(Rotations.of(0)));
 
 		drivetrain.registerTelemetry(logger::telemeterize);
 	}
