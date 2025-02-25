@@ -3,12 +3,10 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.*;
 
 import static edu.wpi.first.units.Units.*;
@@ -17,8 +15,6 @@ import static frc.robot.Constants.Elevator.*;
 public class ElevatorSubsystem extends SubsystemBase {
 	private final TalonFX masterMotor, slaveMotor;
 	private final CANcoder canCoder;
-	private final MotionMagicVoltage forwardMotionMagic;
-	private final MotionMagicVoltage reverseMotionMagic;
 
 	public enum ScoringPosition {
 		HOME(Rotations.of(0)),
@@ -110,9 +106,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 		ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
 		ccConfig.MagnetSensor.MagnetOffset = -0.186767578125;
 		canCoder.getConfigurator().apply(ccConfig);
-
-		forwardMotionMagic = new MotionMagicVoltage(0).withSlot(0);
-		reverseMotionMagic = new MotionMagicVoltage(0).withSlot(1);
 
 	}
 
