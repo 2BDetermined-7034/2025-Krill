@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.util.ArrayList;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -25,6 +24,8 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionPoseMeasurement;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -222,8 +223,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     @Override
     public void periodic() {
         var measurements = vision.getVisionPoseMeasurements();
-        for (var i: measurements) {
-            addVisionMeasurement(i.getRobotPose(), i.getTimeStamp(), i.getStdDevs());
+        for (VisionPoseMeasurement poseMeasurement: measurements) {
+            addVisionMeasurement(poseMeasurement);
         }
 
         /*
@@ -292,5 +293,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         Matrix<N3, N1> visionMeasurementStdDevs
     ) {
         super.addVisionMeasurement(visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds), visionMeasurementStdDevs);
+    }
+
+    public void addVisionMeasurement(VisionPoseMeasurement measurement) {
+        addVisionMeasurement(measurement.getRobotPose(), measurement.getTimeStamp(), measurement.getStdDevs());
     }
 }

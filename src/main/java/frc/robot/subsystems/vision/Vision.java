@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -19,9 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static edu.wpi.first.units.Units.*;
+
 public class Vision {
 
-	private static final AprilTagFieldLayout apriltagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+	private static final AprilTagFieldLayout apriltagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
 	/**
 	 * Construct a vision singleton
@@ -57,18 +59,19 @@ public class Vision {
 	enum Cameras {
 		FRONT_CAM("front",
 			new Transform3d(
-				new Translation3d(0.39, 0, 0.0),
-				new Rotation3d(0, Math.toRadians(-70), 0)),
+				new Translation3d(Meters.of(0.39), Meters.of(0), Inches.of(5)),
+				new Rotation3d(Degrees.of(0), Degrees.of(-69), Degrees.of(0))),
 			PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
 			VecBuilder.fill(2.0, 2.0, 0.5),
+			VecBuilder.fill(1.5, 1.5, 0.5)),
+		BACK_CAM("back",
+					  new Transform3d(
+					  new Translation3d(Meters.of(-0.39), Meters.of(0), Inches.of(5)),
+			new Rotation3d(Degrees.of(0), Degrees.of(-69), Degrees.of(180))),
+		PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+			VecBuilder.fill(2.0, 2.0, 0.5),
 			VecBuilder.fill(1.5, 1.5, 0.5));
-//		BACK_CAM("back",
-//				new Transform3d(
-//						new Translation3d(-0.39, 0.0, 0.23),
-//						new Rotation3d(0, 0, Math.PI)),
-//				PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-//				VecBuilder.fill(2.0, 2.0, 0.5),
-//				VecBuilder.fill(1.0, 1.0, 0.5));
+
 
 		private final PhotonCamera photonCamera;
 		private final Transform3d robotToCam;
