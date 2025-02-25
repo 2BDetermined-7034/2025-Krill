@@ -23,9 +23,26 @@ import static frc.robot.Constants.Elevator.*;
 public class ElevatorSubsystem extends SubsystemBase {
 	private final TalonFX masterMotor, slaveMotor;
 	private final CANcoder canCoder;
-	private VoltageOut voltageControl;
-	private MotionMagicVoltage forwardMotionMagic;
-	private MotionMagicVoltage reverseMotionMagic;
+	private final MotionMagicVoltage forwardMotionMagic;
+	private final MotionMagicVoltage reverseMotionMagic;
+
+	public enum ScoringPosition {
+		HOME(Rotations.of(0)),
+		L1(Rotations.of(0.103027)),
+		L2(Rotations.of(0.541016)),
+		L3(Rotations.of(1.2012)),
+		L4(Rotations.of(2.15332));
+
+		private final Angle scoringPosition;
+
+		ScoringPosition(Angle scoringPosition) {
+			this.scoringPosition = scoringPosition;
+		}
+
+		public Angle getAngle() {
+			return scoringPosition;
+		}
+	}
 
 	public ElevatorSubsystem() {
 		masterMotor = new TalonFX(MASTER_MOTOR_ID, "Drivebase");
@@ -66,7 +83,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 		moConfig.Inverted = InvertedValue.CounterClockwise_Positive;
 		moConfig.NeutralMode = NeutralModeValue.Brake;
 
-		FeedbackConfigs ffConfig = talonFXConfigs.Feedback;;
+		FeedbackConfigs ffConfig = talonFXConfigs.Feedback;
 		ffConfig.FeedbackRemoteSensorID = CANCODER_ID;
 		ffConfig.FeedbackSensorSource = FeedbackSensorSourceValue.SyncCANcoder;
 		ffConfig.RotorToSensorRatio = MOTOR_TO_SENSOR;
@@ -76,7 +93,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 		var motionMagicConfigs = talonFXConfigs.MotionMagic;
 		motionMagicConfigs.MotionMagicCruiseVelocity = 6;
 		motionMagicConfigs.MotionMagicAcceleration = 12;
-//		motionMagicConfis.MotionMagicJerk = 0;
+		motionMagicConfigs.MotionMagicJerk = 0;
 
 		masterMotor.getConfigurator().apply(talonFXConfigs);
 
@@ -96,18 +113,12 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-//		SmartDashboard.putNumber("Elevator Angle Rotations", getElevatorAngle().in(Rotations));
-//		SmartDashboard.putNumber("Elevator Angle Degrees", getElevatorAngle().in(Degrees));
-//		SmartDashboard.putNumber("Elevator Distance Meters", getElevatorPosition().in(Meters));
+
 	}
 
 
 	public Angle getElevatorAngle() {
 		return masterMotor.getPosition().getValue();
-	}
-
-	public Distance getElevatorDistance() {
-		return SPOOL_RADIUS.times(getElevatorAngle().in(Radians));
 	}
 
 	/**
@@ -118,15 +129,17 @@ public class ElevatorSubsystem extends SubsystemBase {
 	public Command setElevatorPosition(Angle angle) {
 
 		return new FunctionalCommand(
-			() -> {
-				masterMotor.setControl(getElevatorAngle().lt(angle)
+			() -> masterMotor.setControl(getElevatorAngle().lt(angle)
 					? forwardMotionMagic.withPosition(angle)
-					: reverseMotionMagic.withPosition(angle));
-			},
+					: reverseMotionMagic.withPosition(angle)),
 			() -> {},
 			(interrupted) -> {},
 			() -> false
 		);
+	}
+
+	public Command setElevatorPosition(ScoringPosition scoringPosition) {
+		return setElevatorPosition(scoringPosition.getAngle());
 	}
 
 }
