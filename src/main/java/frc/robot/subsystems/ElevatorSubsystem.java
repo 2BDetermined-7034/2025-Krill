@@ -141,7 +141,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 			},
 			() -> {},
 			(interrupted) -> {},
-			() -> false
+			() -> true
 		);
 	}
 

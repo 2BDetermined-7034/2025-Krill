@@ -10,6 +10,8 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -49,6 +51,13 @@ public class RobotContainer {
 	public final ElevatorSubsystem elevator = new ElevatorSubsystem();
 
 	public RobotContainer() {
+
+		NamedCommands.registerCommand("L4", ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L4));
+		NamedCommands.registerCommand("Outtake", new OuttakeCommand(arm));
+		NamedCommands.registerCommand("1s Outtake", new OuttakeCommand(arm).withTimeout(Seconds.of(1)));
+		NamedCommands.registerCommand("intakeCoral", ArmElevatorFactory.intakeCoral(elevator, arm));
+
+
 		boolean isCompetition = false;
 
 		// Build an auto chooser. This will use Commands.none() as the default option.
@@ -60,6 +69,8 @@ public class RobotContainer {
 				: stream
 		);
 
+
+		autoChooser.addOption("2m", new PathPlannerAuto("2m"));
 		SmartDashboard.putData("Auto Chooser", autoChooser);
 
 		configureBindings();
@@ -122,6 +133,6 @@ public class RobotContainer {
 	}
 
 	public Command getAutonomousCommand() {
-		return Commands.print("No autonomous command configured");
+		return autoChooser.getSelected();
 	}
 }

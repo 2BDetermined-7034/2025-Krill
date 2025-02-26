@@ -11,6 +11,7 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static edu.wpi.first.units.Units.Amps;
@@ -25,7 +26,7 @@ public class ArmSubsystem extends SubsystemBase {
 
 	public enum ScoringPosition {
 		Outtake(Rotations.of(-0.066895)),
-		IntakeCoralStation(Rotations.of(0.113037));
+		IntakeCoralStation(Rotations.of(0.18));
 		private final Angle armAngle;
 
 		ScoringPosition(Angle armAngle) {
@@ -60,8 +61,8 @@ public class ArmSubsystem extends SubsystemBase {
 		slotConfigs.kG = 0.4;
 		slotConfigs.kV = 0;
 		slotConfigs.kS = 0.35;
-		slotConfigs.kP = 14;
-		slotConfigs.kI = 1;
+		slotConfigs.kP = 18;
+		slotConfigs.kI = 4;
 		slotConfigs.kD = 0;
 		armMotor.getConfigurator().apply(slotConfigs);
 
@@ -90,8 +91,11 @@ public class ArmSubsystem extends SubsystemBase {
 	}
 
 	public Command setArmAngle(Angle position) {
-		return Commands.runOnce(
-			() -> armMotor.setControl(new PositionVoltage(clamp(position, MIN_POSITION, MAX_POSITION)))
+		return new FunctionalCommand(
+			() -> armMotor.setControl(new PositionVoltage(clamp(position, MIN_POSITION, MAX_POSITION))),
+			() -> {},
+			(interrupted) -> {},
+			() -> true
 		);
 	}
 
