@@ -59,18 +59,18 @@ public class Vision {
 	enum Cameras {
 		FRONT_CAM("front",
 			new Transform3d(
-				new Translation3d(Meters.of(0.39), Meters.of(0), Inches.of(5)),
-				new Rotation3d(Degrees.of(0), Degrees.of(-69), Degrees.of(0))),
+				new Translation3d(Meters.of(0.29), Meters.of(0), Inches.of(.185)),
+				new Rotation3d(Degrees.of(0), Degrees.of(-66), Degrees.of(0))),
 			PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
 			VecBuilder.fill(2.0, 2.0, 0.5),
-			VecBuilder.fill(1.5, 1.5, 0.5)),
-		BACK_CAM("back",
-					  new Transform3d(
-					  new Translation3d(Meters.of(-0.39), Meters.of(0), Inches.of(5)),
-			new Rotation3d(Degrees.of(0), Degrees.of(-69), Degrees.of(180))),
-		PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-			VecBuilder.fill(2.0, 2.0, 0.5),
 			VecBuilder.fill(1.5, 1.5, 0.5));
+//		BACK_CAM("back",
+//					  new Transform3d(
+//					  new Translation3d(Meters.of(-0.39), Meters.of(0), Inches.of(5)),
+//			new Rotation3d(Degrees.of(0), Degrees.of(-69), Degrees.of(180))),
+//		PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+//			VecBuilder.fill(2.0, 2.0, 0.5),
+//			VecBuilder.fill(1.5, 1.5, 0.5));
 
 
 		private final PhotonCamera photonCamera;
