@@ -92,41 +92,16 @@ public class RobotContainer {
 
 		joystick.options().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
-        /*joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        joystick.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
-        ));*/
-
-
-//		joystick.circle().onTrue(arm.setPositionCommand(Degrees.of(30.0)));
-//		joystick.cross().onTrue(arm.coastOutCommand());
 
 		joystick.R2().whileTrue(new IntakeCommand(arm));
 		joystick.L2().whileTrue(new OuttakeCommand(arm));
 
-		//joystick.triangle().onTrue(elevator.setElevatorPosition(Rotations.of(1.5)));
-		//joystick.square().onTrue(elevator.setElevatorPosition(Rotations.of(0)));
-
-		/*
-		joystick.povUp().and(joystick.triangle()).whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-		joystick.povDown().and(joystick.triangle()).whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-		joystick.povUp().and(joystick.cross()).whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kForward));
-		joystick.povDown().and(joystick.cross()).whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-		*/
-
-		joystick.povDown().whileTrue(elevator.setElevatorPosition(ScoringPosition.HOME));
-		/*joystick.povUp().whileTrue(elevator.setElevatorPosition(ScoringPosition.L4));
-		joystick.povLeft().whileTrue(elevator.setElevatorPosition(ScoringPosition.L3));
-		joystick.povRight().whileTrue(elevator.setElevatorPosition(ScoringPosition.L2));
-		joystick.povRight().and(joystick.cross()).whileTrue(elevator.setElevatorPosition(ScoringPosition.L1));
-		*/
 
 		joystick.triangle().whileTrue(ArmElevatorFactory.intakeCoral(elevator, arm));
 		joystick.povUp().whileTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L4));
 		joystick.povLeft().whileTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L3));
 		joystick.povRight().whileTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L2));
 		joystick.povRight().and(joystick.cross()).whileTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L1));
-
 
 
 		drivetrain.registerTelemetry(logger::telemeterize);
