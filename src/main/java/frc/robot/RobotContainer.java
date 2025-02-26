@@ -13,9 +13,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 
-import frc.robot.commands.Intake.IntakeAlgaeCommand;
+import frc.robot.commands.Intake.ArmAlgaeCommand;
 import frc.robot.commands.Intake.IntakeCommand;
 import frc.robot.commands.Intake.OuttakeCommand;
+import frc.robot.commands.Reef.ArmElevatorFactory;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -72,7 +73,7 @@ public class RobotContainer {
 
 		joystick.R2().whileTrue(new IntakeCommand(arm));
 		joystick.L2().whileTrue(new OuttakeCommand(arm));
-		joystick.L1().whileTrue(new IntakeAlgaeCommand(arm));
+//		joystick.L1().and(joystick.L2()).whileTrue(new ArmAlgaeCommand(arm));
 
 		//joystick.triangle().onTrue(elevator.setElevatorPosition(Rotations.of(1.5)));
 		//joystick.square().onTrue(elevator.setElevatorPosition(Rotations.of(0)));
@@ -89,6 +90,10 @@ public class RobotContainer {
 		joystick.povLeft().whileTrue(elevator.setElevatorPosition(ScoringPosition.L3));
 		joystick.povRight().whileTrue(elevator.setElevatorPosition(ScoringPosition.L2));
 		joystick.povRight().and(joystick.cross()).whileTrue(elevator.setElevatorPosition(ScoringPosition.L1));
+
+		joystick.L1().whileTrue(ArmElevatorFactory.IntakeAlgae(elevator, arm, ScoringPosition.AlgaeBottom));
+		joystick.R1().whileTrue(ArmElevatorFactory.IntakeAlgae(elevator, arm, ScoringPosition.AlgaeTop));
+
 
 
 

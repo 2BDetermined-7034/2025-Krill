@@ -24,7 +24,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 		L1(Rotations.of(0.103027)),
 		L2(Rotations.of(0.553223)),
 		L3(Rotations.of(1.222168)),
-		L4(Rotations.of(2.24));
+		L4(Rotations.of(2.24)),
+
+		AlgaeBottom(Rotations.of(0.21)),
+		AlgaeTop(Rotations.of(0.964));
 
 		private final Angle scoringPosition;
 
