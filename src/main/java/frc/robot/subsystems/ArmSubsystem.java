@@ -7,23 +7,27 @@ import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
-import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import static edu.wpi.first.units.Units.Amps;
 import static frc.robot.Constants.Arm.*;
 
 public class ArmSubsystem extends SubsystemBase {
-	private TalonFX motor;
+	private TalonFX armMotor;
+	private TalonFX intakeMotor;
 	private CANcoder canCoder;
 
 	public ArmSubsystem() {
-		motor = new TalonFX(MOTOR_ID, "rio");
+		armMotor = new TalonFX(ARM_MOTOR_ID, "rio");
+		intakeMotor = new TalonFX(INTAKE_MOTOR_ID, "rio");
 		canCoder = new CANcoder(CANCODER_ID, "rio");
-
 
 		var mConfig = new TalonFXConfiguration();
 		mConfig.Feedback.FeedbackRemoteSensorID = CANCODER_ID;
@@ -32,8 +36,8 @@ public class ArmSubsystem extends SubsystemBase {
 		mConfig.Feedback.SensorToMechanismRatio = 1.0;
 		mConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 		mConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-		mConfig.CurrentLimits.SupplyCurrentLimit = CURRENT_LIMIT.in(Units.Amps);
-		motor.getConfigurator().apply(mConfig);
+		mConfig.CurrentLimits.SupplyCurrentLimit = ARM_CURRENT_LIMIT.in(Amps);
+		armMotor.getConfigurator().apply(mConfig);
 
 		Slot0Configs slotConfigs = new Slot0Configs();
 		slotConfigs.GravityType = GravityTypeValue.Arm_Cosine;
@@ -45,7 +49,7 @@ public class ArmSubsystem extends SubsystemBase {
 		slotConfigs.kP = 14;
 		slotConfigs.kI = 0;
 		slotConfigs.kD = 0;
-		motor.getConfigurator().apply(slotConfigs);
+		armMotor.getConfigurator().apply(slotConfigs);
 
 		var ccConfig = new CANcoderConfiguration();
 		ccConfig.MagnetSensor.MagnetOffset = CANCODER_OFFSET;
@@ -55,12 +59,12 @@ public class ArmSubsystem extends SubsystemBase {
 	}
 
 	public Angle getPosition() {
-		return motor.getPosition().getValue();
+		return armMotor.getPosition().getValue();
 	}
 
 	public Command coastOutCommand() {
 		return Commands.runOnce(
-			() -> motor.setControl(new CoastOut())
+			() -> armMotor.setControl(new CoastOut())
 		);
 	}
 
@@ -73,15 +77,11 @@ public class ArmSubsystem extends SubsystemBase {
 
 	public Command setPositionCommand(Angle position) {
 		return Commands.runOnce(
-			() -> motor.setControl(new PositionVoltage(clamp(position, MIN_POSITION, MAX_POSITION)))
+			() -> armMotor.setControl(new PositionVoltage(clamp(position, MIN_POSITION, MAX_POSITION)))
 		);
 	}
 
-//	public Command sysIDQuasistatic(SysIdRoutine.Direction direction) {
-//		return routine.quasistatic(direction);
-//	}
-//
-//	public Command sysIDDynamic(SysIdRoutine.Direction direction) {
-//		return routine.dynamic(direction);
-//	}
+	public TalonFX getIntakeMotor() {
+		return intakeMotor;
+	}
 }
