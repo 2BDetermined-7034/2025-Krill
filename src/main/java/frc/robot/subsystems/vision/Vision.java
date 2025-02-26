@@ -9,6 +9,8 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -28,9 +30,7 @@ public class Vision {
 	/**
 	 * Construct a vision singleton
 	 */
-	public Vision() {
-
-	}
+	public Vision() {}
 
 	/**
 	 * create a list of drivebase {@link VisionPoseMeasurement} estimates from vision cameras.
@@ -57,20 +57,27 @@ public class Vision {
 	}
 
 	enum Cameras {
-		FRONT_CAM("front",
+		FRONT_CAM(
+			"front",
 			new Transform3d(
-				new Translation3d(Meters.of(0.29), Meters.of(0), Inches.of(.185)),
-				new Rotation3d(Degrees.of(0), Degrees.of(-66), Degrees.of(0))),
+				new Translation3d(Meters.of(0.355), Meters.of(0), Meters.of(0.18)),
+				new Rotation3d(Degrees.of(0), Degrees.of(-24.4), Degrees.of(0))
+			),
 			PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
 			VecBuilder.fill(2.0, 2.0, 0.5),
-			VecBuilder.fill(1.5, 1.5, 0.5));
-//		BACK_CAM("back",
-//					  new Transform3d(
-//					  new Translation3d(Meters.of(-0.39), Meters.of(0), Inches.of(5)),
-//			new Rotation3d(Degrees.of(0), Degrees.of(-69), Degrees.of(180))),
-//		PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-//			VecBuilder.fill(2.0, 2.0, 0.5),
-//			VecBuilder.fill(1.5, 1.5, 0.5));
+			VecBuilder.fill(1.5, 1.5, 0.5)
+		),
+
+		BACK_CAM(
+			"back",
+				new Transform3d(
+				new Translation3d(Meters.of(-0.355), Meters.of(0), Meters.of(0.19)),
+				new Rotation3d(Degrees.of(0), Degrees.of(-24.4), Degrees.of(180.0))
+			),
+			PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+			VecBuilder.fill(2.0, 2.0, 0.5),
+			VecBuilder.fill(1.5, 1.5, 0.5)
+		);
 
 
 		private final PhotonCamera photonCamera;

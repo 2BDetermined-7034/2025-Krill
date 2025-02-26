@@ -14,7 +14,6 @@ public class IntakeCommand extends Command {
 
 	public IntakeCommand(ArmSubsystem arm) {
 		this.arm = arm;
-		addRequirements(arm);
 	}
 
 	@Override

@@ -9,12 +9,16 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 
 import frc.robot.commands.Intake.IntakeCommand;
 import frc.robot.commands.Intake.OuttakeCommand;
+import frc.robot.commands.Reef.ArmElevatorFactory;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -35,6 +39,8 @@ public class RobotContainer {
 
 	private final Telemetry logger = new Telemetry(MaxSpeed);
 
+	private SendableChooser<Command> autoChooser;
+
 	//private final CommandXboxController joystick = new CommandXboxController(0);
 	private final CommandPS5Controller joystick = new CommandPS5Controller(0);
 
@@ -43,7 +49,22 @@ public class RobotContainer {
 	public final ElevatorSubsystem elevator = new ElevatorSubsystem();
 
 	public RobotContainer() {
+		boolean isCompetition = false;
+
+		// Build an auto chooser. This will use Commands.none() as the default option.
+		// As an example, this will only show autos that start with "comp" while at
+		// competition as defined by the programmer
+		autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
+			(stream) -> isCompetition
+				? stream.filter(auto -> auto.getName().startsWith("comp"))
+				: stream
+		);
+
+		SmartDashboard.putData("Auto Chooser", autoChooser);
+
 		configureBindings();
+
+
 	}
 
 	private void configureBindings() {
@@ -83,11 +104,17 @@ public class RobotContainer {
 		*/
 
 		joystick.povDown().whileTrue(elevator.setElevatorPosition(ScoringPosition.HOME));
-		joystick.povUp().whileTrue(elevator.setElevatorPosition(ScoringPosition.L4));
+		/*joystick.povUp().whileTrue(elevator.setElevatorPosition(ScoringPosition.L4));
 		joystick.povLeft().whileTrue(elevator.setElevatorPosition(ScoringPosition.L3));
 		joystick.povRight().whileTrue(elevator.setElevatorPosition(ScoringPosition.L2));
 		joystick.povRight().and(joystick.cross()).whileTrue(elevator.setElevatorPosition(ScoringPosition.L1));
+		*/
 
+		joystick.triangle().whileTrue(ArmElevatorFactory.intakeCoral(elevator, arm));
+		joystick.povUp().whileTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L4));
+		joystick.povLeft().whileTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L3));
+		joystick.povRight().whileTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L2));
+		joystick.povRight().and(joystick.cross()).whileTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L1));
 
 
 

@@ -9,20 +9,34 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.Constants.Arm.*;
 
 public class ArmSubsystem extends SubsystemBase {
 	private TalonFX armMotor;
 	private TalonFX intakeMotor;
 	private CANcoder canCoder;
+
+
+	public enum ScoringPosition {
+		Outtake(Rotations.of(-0.066895)),
+		IntakeCoralStation(Rotations.of(0.113037));
+		private final Angle armAngle;
+
+		ScoringPosition(Angle armAngle) {
+			this.armAngle = armAngle;
+		}
+
+		public Angle getArmAngle() {
+			return armAngle;
+		}
+	}
+
 
 	public ArmSubsystem() {
 		armMotor = new TalonFX(ARM_MOTOR_ID, "rio");
@@ -47,7 +61,7 @@ public class ArmSubsystem extends SubsystemBase {
 		slotConfigs.kV = 0;
 		slotConfigs.kS = 0.35;
 		slotConfigs.kP = 14;
-		slotConfigs.kI = 0;
+		slotConfigs.kI = 1;
 		slotConfigs.kD = 0;
 		armMotor.getConfigurator().apply(slotConfigs);
 
@@ -75,7 +89,7 @@ public class ArmSubsystem extends SubsystemBase {
 		return angle;
 	}
 
-	public Command setPositionCommand(Angle position) {
+	public Command setArmAngle(Angle position) {
 		return Commands.runOnce(
 			() -> armMotor.setControl(new PositionVoltage(clamp(position, MIN_POSITION, MAX_POSITION)))
 		);
@@ -83,5 +97,9 @@ public class ArmSubsystem extends SubsystemBase {
 
 	public TalonFX getIntakeMotor() {
 		return intakeMotor;
+	}
+
+	public Command setArmAngle(ScoringPosition scoringPosition) {
+		return setArmAngle(scoringPosition.getArmAngle());
 	}
 }
