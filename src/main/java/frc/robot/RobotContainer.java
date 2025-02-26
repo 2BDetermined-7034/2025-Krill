@@ -13,12 +13,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 
-import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.OuttakeCommand;
+import frc.robot.commands.Intake.IntakeCommand;
+import frc.robot.commands.Intake.OuttakeCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem.ScoringPosition;
+
 
 public class RobotContainer {
 	private final double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -50,8 +52,8 @@ public class RobotContainer {
 		drivetrain.setDefaultCommand(
 			// Drivetrain will execute this command periodically
 			drivetrain.applyRequest(() ->
-				drive.withVelocityX(joystick.getLeftY() * MaxSpeed * 0.5) // Drive forward with negative Y (forward)
-					.withVelocityY(joystick.getLeftX() * MaxSpeed * 0.5) // Drive left with negative X (left)
+				drive.withVelocityX(joystick.getLeftY() * MaxSpeed * -0.5) // Drive forward with negative Y (forward)
+					.withVelocityY(joystick.getLeftX() * MaxSpeed * -0.5) // Drive left with negative X (left)
 					.withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
 			)
 		);
@@ -70,8 +72,24 @@ public class RobotContainer {
 		joystick.R2().whileTrue(new IntakeCommand(arm));
 		joystick.L2().whileTrue(new OuttakeCommand(arm));
 
-		joystick.triangle().onTrue(elevator.setElevatorPosition(Rotations.of(1.5)));
-		joystick.square().onTrue(elevator.setElevatorPosition(Rotations.of(0)));
+		//joystick.triangle().onTrue(elevator.setElevatorPosition(Rotations.of(1.5)));
+		//joystick.square().onTrue(elevator.setElevatorPosition(Rotations.of(0)));
+
+		/*
+		joystick.povUp().and(joystick.triangle()).whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+		joystick.povDown().and(joystick.triangle()).whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+		joystick.povUp().and(joystick.cross()).whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kForward));
+		joystick.povDown().and(joystick.cross()).whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+		*/
+
+		joystick.povDown().whileTrue(elevator.setElevatorPosition(ScoringPosition.HOME));
+		joystick.povUp().whileTrue(elevator.setElevatorPosition(ScoringPosition.L4));
+		joystick.povLeft().whileTrue(elevator.setElevatorPosition(ScoringPosition.L3));
+		joystick.povRight().whileTrue(elevator.setElevatorPosition(ScoringPosition.L2));
+		joystick.povRight().and(joystick.cross()).whileTrue(elevator.setElevatorPosition(ScoringPosition.L1));
+
+
+
 
 		drivetrain.registerTelemetry(logger::telemeterize);
 	}
