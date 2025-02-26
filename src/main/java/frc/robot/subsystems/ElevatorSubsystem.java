@@ -1,13 +1,16 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.*;
+import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.Elevator.*;
@@ -19,9 +22,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 	public enum ScoringPosition {
 		HOME(Rotations.of(0)),
 		L1(Rotations.of(0.103027)),
-		L2(Rotations.of(0.541016)),
-		L3(Rotations.of(1.2012)),
-		L4(Rotations.of(2.15332));
+		L2(Rotations.of(0.553223)),
+		L3(Rotations.of(1.222168)),
+		L4(Rotations.of(2.24));
 
 		private final Angle scoringPosition;
 
@@ -98,14 +101,14 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 		masterMotor.getConfigurator().apply(talonFXConfigs);
 
-
-
 		canCoder = new CANcoder(CANCODER_ID, "Drivebase");
 
 		var ccConfig = new CANcoderConfiguration();
 		ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-		ccConfig.MagnetSensor.MagnetOffset = -0.186767578125;
+		ccConfig.MagnetSensor.MagnetOffset = -0.1845703125;
 		canCoder.getConfigurator().apply(ccConfig);
+
+		new Trigger(DriverStation::isEnabled).onTrue(Commands.runOnce(() -> masterMotor.setControl(new CoastOut())));
 
 	}
 
