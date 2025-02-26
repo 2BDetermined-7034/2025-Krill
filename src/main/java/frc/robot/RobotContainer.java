@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
@@ -17,6 +18,7 @@ import frc.robot.commands.Intake.IntakeCommand;
 import frc.robot.commands.Intake.OuttakeCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem.ScoringPosition;
@@ -41,6 +43,7 @@ public class RobotContainer {
 	public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 	public final ArmSubsystem arm = new ArmSubsystem();
 	public final ElevatorSubsystem elevator = new ElevatorSubsystem();
+	public final ClimbSubsystem climb = new ClimbSubsystem();
 
 	public RobotContainer() {
 		configureBindings();
@@ -71,6 +74,7 @@ public class RobotContainer {
 
 		joystick.R2().whileTrue(new IntakeCommand(arm));
 		joystick.L2().whileTrue(new OuttakeCommand(arm));
+		joystick.L1().whileTrue(climb.Climb(Volts.of(5.0)));
 
 		//joystick.triangle().onTrue(elevator.setElevatorPosition(Rotations.of(1.5)));
 		//joystick.square().onTrue(elevator.setElevatorPosition(Rotations.of(0)));
