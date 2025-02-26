@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-
+import frc.robot.commands.Auto.OTFPathFinding;
 import frc.robot.commands.Intake.IntakeCommand;
 import frc.robot.commands.Intake.OuttakeCommand;
 import frc.robot.commands.Reef.ArmElevatorFactory;
@@ -103,6 +103,7 @@ public class RobotContainer {
 		joystick.povRight().whileTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L2));
 		joystick.povRight().and(joystick.cross()).whileTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L1));
 
+		joystick.square().whileTrue(OTFPathFinding.goToNearestReef(drivetrain));
 
 		drivetrain.registerTelemetry(logger::telemeterize);
 	}

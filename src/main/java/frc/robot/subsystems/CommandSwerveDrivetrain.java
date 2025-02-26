@@ -137,11 +137,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SwerveModuleConstants<?, ?, ?>... modules
     ) {
         super(drivetrainConstants, modules);
+        configureAutoBuilder();
         if (Utils.isSimulation()) {
             startSimThread();
         }
 
-        configureAutoBuilder();
+        
     }
 
     /**
