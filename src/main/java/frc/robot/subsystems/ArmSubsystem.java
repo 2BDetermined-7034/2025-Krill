@@ -14,8 +14,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.Arm.*;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -25,8 +24,8 @@ public class ArmSubsystem extends SubsystemBase {
 
 
 	public enum ScoringPosition {
-		Outtake(Rotations.of(-0.066895)),
-		IntakeCoralStation(Rotations.of(0.18));
+		Outtake(Rotations.of(-0.056895)),
+		IntakeCoralStation(Rotations.of(0.076));
 		private final Angle armAngle;
 
 		ScoringPosition(Angle armAngle) {
@@ -44,27 +43,29 @@ public class ArmSubsystem extends SubsystemBase {
 		intakeMotor = new TalonFX(INTAKE_MOTOR_ID, "rio");
 		canCoder = new CANcoder(CANCODER_ID, "rio");
 
-		var mConfig = new TalonFXConfiguration();
-		mConfig.Feedback.FeedbackRemoteSensorID = CANCODER_ID;
-		mConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.SyncCANcoder;
-		mConfig.Feedback.RotorToSensorRatio = GEAR_RATIO;
-		mConfig.Feedback.SensorToMechanismRatio = 1.0;
-		mConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-		mConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-		mConfig.CurrentLimits.SupplyCurrentLimit = ARM_CURRENT_LIMIT.in(Amps);
-		armMotor.getConfigurator().apply(mConfig);
+		var talonFXConfiguration = new TalonFXConfiguration();
 
-		Slot0Configs slotConfigs = new Slot0Configs();
+
+		Slot0Configs slotConfigs = talonFXConfiguration.Slot0;
 		slotConfigs.GravityType = GravityTypeValue.Arm_Cosine;
 		slotConfigs.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 		slotConfigs.kA = 0;
 		slotConfigs.kG = 0.4;
 		slotConfigs.kV = 0;
 		slotConfigs.kS = 0.35;
-		slotConfigs.kP = 18;
-		slotConfigs.kI = 4;
-		slotConfigs.kD = 0;
-		armMotor.getConfigurator().apply(slotConfigs);
+		slotConfigs.kP = 24;
+		slotConfigs.kI = 15;
+		slotConfigs.kD = 1;
+
+		talonFXConfiguration.Feedback.FeedbackRemoteSensorID = CANCODER_ID;
+		talonFXConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+		talonFXConfiguration.Feedback.RotorToSensorRatio = GEAR_RATIO;
+		talonFXConfiguration.Feedback.SensorToMechanismRatio = 1.0;
+		talonFXConfiguration.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+		talonFXConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+		talonFXConfiguration.CurrentLimits.SupplyCurrentLimit = ARM_CURRENT_LIMIT.in(Amps);
+		armMotor.getConfigurator().apply(talonFXConfiguration);
+
 
 		var ccConfig = new CANcoderConfiguration();
 		ccConfig.MagnetSensor.MagnetOffset = CANCODER_OFFSET;
@@ -105,5 +106,19 @@ public class ArmSubsystem extends SubsystemBase {
 
 	public Command setArmAngle(ScoringPosition scoringPosition) {
 		return setArmAngle(scoringPosition.getArmAngle());
+	}
+
+
+	/**
+	 * Spins the intake with a timeout for autos
+	 * @return
+	 */
+	public Command spinIntakeCommand() {
+		return new FunctionalCommand(
+			() -> intakeMotor.setControl(new VoltageOut(2.0)),
+			() -> {},
+			(interrupted) -> {},
+			() -> false
+		).withTimeout(Seconds.of(0.5));
 	}
 }

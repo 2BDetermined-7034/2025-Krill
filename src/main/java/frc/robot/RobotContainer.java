@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.commands.Auto.OTFPathFinding;
 import frc.robot.commands.Intake.IntakeCommand;
@@ -53,9 +54,12 @@ public class RobotContainer {
 	public RobotContainer() {
 
 		NamedCommands.registerCommand("L4", ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L4));
+		NamedCommands.registerCommand("L2", ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L2));
+
 		NamedCommands.registerCommand("Outtake", new OuttakeCommand(arm));
 		NamedCommands.registerCommand("1s Outtake", new OuttakeCommand(arm).withTimeout(Seconds.of(1)));
-		NamedCommands.registerCommand("intakeCoral", ArmElevatorFactory.intakeCoral(elevator, arm));
+		NamedCommands.registerCommand("intakeCoral", ArmElevatorFactory.intakeCoral(elevator, arm).andThen(new WaitCommand(0.4)));
+		NamedCommands.registerCommand("Spin Intake", arm.spinIntakeCommand());
 
 
 		boolean isCompetition = false;
@@ -101,8 +105,7 @@ public class RobotContainer {
 		joystick.povUp().whileTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L4));
 		joystick.povLeft().whileTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L3));
 		joystick.povRight().whileTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L2));
-		joystick.povRight().and(joystick.cross()).whileTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L1));
-
+		joystick.povDown().whileTrue(elevator.setElevatorPosition(ScoringPosition.HOME));
 		joystick.square().whileTrue(OTFPathFinding.goToNearestReef(drivetrain));
 
 		drivetrain.registerTelemetry(logger::telemeterize);

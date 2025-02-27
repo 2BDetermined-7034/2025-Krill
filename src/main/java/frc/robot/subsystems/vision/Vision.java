@@ -61,10 +61,10 @@ public class Vision {
 			"front",
 			new Transform3d(
 				new Translation3d(Meters.of(0.355), Meters.of(0), Meters.of(0.18)),
-				new Rotation3d(Degrees.of(0), Degrees.of(-24.4), Degrees.of(0))
+				new Rotation3d(Degrees.of(0), Degrees.of(-19.0), Degrees.of(0))
 			),
 			PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-			VecBuilder.fill(2.0, 2.0, 0.5),
+			VecBuilder.fill(3, 3, 0.5),
 			VecBuilder.fill(1.5, 1.5, 0.5)
 		),
 
@@ -72,11 +72,11 @@ public class Vision {
 			"back",
 				new Transform3d(
 				new Translation3d(Meters.of(-0.355), Meters.of(0), Meters.of(0.19)),
-				new Rotation3d(Degrees.of(0), Degrees.of(-24.4), Degrees.of(180.0))
+				new Rotation3d(Degrees.of(0), Degrees.of(-25.0), Degrees.of(180.0))
 			),
 			PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-			VecBuilder.fill(2.0, 2.0, 0.5),
-			VecBuilder.fill(1.5, 1.5, 0.5)
+			VecBuilder.fill(4.0, 4.0, 0.5),
+			VecBuilder.fill(2.0, 2.0, 0.5)
 		);
 
 

@@ -15,14 +15,15 @@ public class ArmElevatorFactory {
 			elevator.setElevatorPosition(scoringPosition),
 			arm.setArmAngle(ArmSubsystem.ScoringPosition.Outtake)
 			//OTFPathFinding.goToNearestReef(swerveDrivetrain)
-		).andThen(Commands.print("Command Ended"));
+		);
 	}
 
 	public static Command intakeCoral(ElevatorSubsystem elevator, ArmSubsystem arm) {
 		return new ParallelCommandGroup(
-			elevator.setElevatorPosition(ElevatorSubsystem.ScoringPosition.HOME),
+			Commands.print("intakeCoral Starting"),
+			elevator.setElevatorPosition(ElevatorSubsystem.ScoringPosition.INTAKE),
 			arm.setArmAngle(ArmSubsystem.ScoringPosition.IntakeCoralStation),
 			new IntakeCommand(arm)
-		);
+		).andThen(Commands.print("intakeCoral Ended"));
 	}
 }

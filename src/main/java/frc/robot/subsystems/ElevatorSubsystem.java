@@ -22,6 +22,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 	public enum ScoringPosition {
 		HOME(Rotations.of(0)),
 		L1(Rotations.of(0.103027)),
+		INTAKE(Rotations.of(0.1)),
 		L2(Rotations.of(0.553223)),
 		L3(Rotations.of(1.222168)),
 		L4(Rotations.of(2.24));
