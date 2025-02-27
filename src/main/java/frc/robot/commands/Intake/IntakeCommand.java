@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ArmSubsystem;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 public class IntakeCommand extends Command {
 	private final ArmSubsystem arm;
@@ -14,13 +15,12 @@ public class IntakeCommand extends Command {
 
 	public IntakeCommand(ArmSubsystem arm) {
 		this.arm = arm;
-		addRequirements(arm);
 	}
 
 	@Override
 	public void initialize() {
 		overcameInitial = false;
-		arm.getIntakeMotor().setControl(new VoltageOut(3.0));
+		arm.getIntakeMotor().setControl(new VoltageOut(4.0));
 	}
 
 	@Override
@@ -38,7 +38,8 @@ public class IntakeCommand extends Command {
 	@Override
 	public boolean isFinished() {
 		if (overcameInitial) {
-			return arm.getIntakeMotor().getTorqueCurrent().getValue().gt(Amps.of(70.0));
+			return arm.getIntakeMotor().getTorqueCurrent().getValue().gt(Amps.of(99))
+				&& arm.getIntakeMotor().getVelocity().getValue().abs(RotationsPerSecond) < 2;
 		}
 
 		return false;

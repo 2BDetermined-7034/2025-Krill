@@ -10,12 +10,19 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-
+import frc.robot.commands.Auto.OTFPathFinding;
 import frc.robot.commands.Intake.IntakeCommand;
 import frc.robot.commands.Intake.OuttakeCommand;
+import frc.robot.commands.Reef.ArmElevatorFactory;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
@@ -37,6 +44,8 @@ public class RobotContainer {
 
 	private final Telemetry logger = new Telemetry(MaxSpeed);
 
+	private SendableChooser<Command> autoChooser;
+
 	//private final CommandXboxController joystick = new CommandXboxController(0);
 	private final CommandPS5Controller joystick = new CommandPS5Controller(0);
 
@@ -46,7 +55,34 @@ public class RobotContainer {
 	public final ClimbSubsystem climb = new ClimbSubsystem();
 
 	public RobotContainer() {
+
+		NamedCommands.registerCommand("L4", ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L4));
+		NamedCommands.registerCommand("L2", ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L2));
+
+		NamedCommands.registerCommand("Outtake", new OuttakeCommand(arm));
+		NamedCommands.registerCommand("1s Outtake", new OuttakeCommand(arm).withTimeout(Seconds.of(1)));
+		NamedCommands.registerCommand("intakeCoral", ArmElevatorFactory.intakeCoral(elevator, arm).andThen(new WaitCommand(0.4)));
+		NamedCommands.registerCommand("Spin Intake", arm.spinIntakeCommand());
+
+
+		boolean isCompetition = false;
+
+		// Build an auto chooser. This will use Commands.none() as the default option.
+		// As an example, this will only show autos that start with "comp" while at
+		// competition as defined by the programmer
+		autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
+			(stream) -> isCompetition
+				? stream.filter(auto -> auto.getName().startsWith("comp"))
+				: stream
+		);
+
+
+		autoChooser.addOption("2m", new PathPlannerAuto("2m"));
+		SmartDashboard.putData("Auto Chooser", autoChooser);
+
 		configureBindings();
+
+
 	}
 
 	private void configureBindings() {
@@ -63,14 +99,6 @@ public class RobotContainer {
 
 		joystick.options().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
-        /*joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        joystick.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
-        ));*/
-
-
-//		joystick.circle().onTrue(arm.setPositionCommand(Degrees.of(30.0)));
-//		joystick.cross().onTrue(arm.coastOutCommand());
 
 		joystick.R2().whileTrue(new IntakeCommand(arm));
 		joystick.L2().whileTrue(new OuttakeCommand(arm));
@@ -78,29 +106,18 @@ public class RobotContainer {
 		joystick.R1().whileTrue(climb.Climb(Volts.of(-3.0)));
 
 
-		//joystick.triangle().onTrue(elevator.setElevatorPosition(Rotations.of(1.5)));
-		//joystick.square().onTrue(elevator.setElevatorPosition(Rotations.of(0)));
 
-		/*
-		joystick.povUp().and(joystick.triangle()).whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-		joystick.povDown().and(joystick.triangle()).whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-		joystick.povUp().and(joystick.cross()).whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kForward));
-		joystick.povDown().and(joystick.cross()).whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-		*/
-
+		joystick.triangle().whileTrue(ArmElevatorFactory.intakeCoral(elevator, arm));
+		joystick.povUp().whileTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L4));
+		joystick.povLeft().whileTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L3));
+		joystick.povRight().whileTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L2));
 		joystick.povDown().whileTrue(elevator.setElevatorPosition(ScoringPosition.HOME));
-		joystick.povUp().whileTrue(elevator.setElevatorPosition(ScoringPosition.L4));
-		joystick.povLeft().whileTrue(elevator.setElevatorPosition(ScoringPosition.L3));
-		joystick.povRight().whileTrue(elevator.setElevatorPosition(ScoringPosition.L2));
-		joystick.povRight().and(joystick.cross()).whileTrue(elevator.setElevatorPosition(ScoringPosition.L1));
-
-
-
+		joystick.square().whileTrue(OTFPathFinding.goToNearestReef(drivetrain));
 
 		drivetrain.registerTelemetry(logger::telemeterize);
 	}
 
 	public Command getAutonomousCommand() {
-		return Commands.print("No autonomous command configured");
+		return autoChooser.getSelected();
 	}
 }
