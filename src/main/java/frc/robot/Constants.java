@@ -35,4 +35,10 @@ public class Constants {
 
 		public static final Distance SPOOL_RADIUS = Inches.of(3.82/2);
 	}
+
+	public static final class Climb {
+		public static final int CLIMB_MOTOR_ID = 0;
+		public static final Current CURRENT_LIMIT = Amps.of(100);
+		public static final Angle CLIMB_TOLERANCE = Rotations.of(0.1);
+	}
 }
