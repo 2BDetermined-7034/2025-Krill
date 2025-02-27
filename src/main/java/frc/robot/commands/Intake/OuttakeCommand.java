@@ -10,7 +10,6 @@ public class OuttakeCommand extends Command {
 
 	public OuttakeCommand(ArmSubsystem arm) {
 		this.arm = arm;
-		addRequirements(arm);
 	}
 
 	@Override

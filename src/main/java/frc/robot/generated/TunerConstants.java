@@ -214,7 +214,7 @@ public class TunerConstants {
          * getters in the classes.
          *
          * @param drivetrainConstants   Drivetrain-wide constants for the swerve drive
-         * @param modules               Constants for each specific module
+         * @param modules               project.chor for each specific module
          */
         public TunerSwerveDrivetrain(
             SwerveDrivetrainConstants drivetrainConstants,
@@ -237,7 +237,7 @@ public class TunerConstants {
          * @param odometryUpdateFrequency The frequency to run the odometry loop. If
          *                                unspecified or set to 0 Hz, this is 250 Hz on
          *                                CAN FD, and 100 Hz on CAN 2.0.
-         * @param modules                 Constants for each specific module
+         * @param modules                 project.chor for each specific module
          */
         public TunerSwerveDrivetrain(
             SwerveDrivetrainConstants drivetrainConstants,
@@ -267,7 +267,7 @@ public class TunerConstants {
          * @param visionStandardDeviation   The standard deviation for vision calculation
          *                                  in the form [x, y, theta]ᵀ, with units in meters
          *                                  and radians
-         * @param modules                   Constants for each specific module
+         * @param modules                   project.chor for each specific module
          */
         public TunerSwerveDrivetrain(
             SwerveDrivetrainConstants drivetrainConstants,
