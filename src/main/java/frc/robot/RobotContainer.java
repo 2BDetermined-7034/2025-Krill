@@ -74,7 +74,9 @@ public class RobotContainer {
 
 		joystick.R2().whileTrue(new IntakeCommand(arm));
 		joystick.L2().whileTrue(new OuttakeCommand(arm));
-		joystick.L1().whileTrue(climb.Climb(Volts.of(5.0)));
+		joystick.L1().whileTrue(climb.Climb(Volts.of(3.0)));
+		joystick.R1().whileTrue(climb.Climb(Volts.of(-3.0)));
+
 
 		//joystick.triangle().onTrue(elevator.setElevatorPosition(Rotations.of(1.5)));
 		//joystick.square().onTrue(elevator.setElevatorPosition(Rotations.of(0)));
