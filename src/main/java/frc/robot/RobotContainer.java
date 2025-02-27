@@ -6,7 +6,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
@@ -16,7 +15,6 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.commands.Auto.OTFPathFinding;
@@ -28,7 +26,7 @@ import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.ElevatorSubsystem.ScoringPosition;
+import frc.robot.subsystems.ElevatorSubsystem.ElevatorPosition;
 
 
 public class RobotContainer {
@@ -47,7 +45,8 @@ public class RobotContainer {
 	private SendableChooser<Command> autoChooser;
 
 	//private final CommandXboxController joystick = new CommandXboxController(0);
-	private final CommandPS5Controller joystick = new CommandPS5Controller(0);
+	private final CommandPS5Controller driverController = new CommandPS5Controller(0);
+	private final CommandPS5Controller operatorController = new CommandPS5Controller(1);
 
 	public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 	public final ArmSubsystem arm = new ArmSubsystem();
@@ -56,8 +55,8 @@ public class RobotContainer {
 
 	public RobotContainer() {
 
-		NamedCommands.registerCommand("L4", ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L4));
-		NamedCommands.registerCommand("L2", ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L2));
+		NamedCommands.registerCommand("L4", ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L4));
+		NamedCommands.registerCommand("L2", ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L2));
 
 		NamedCommands.registerCommand("Outtake", new OuttakeCommand(arm));
 		NamedCommands.registerCommand("1s Outtake", new OuttakeCommand(arm).withTimeout(Seconds.of(1)));
@@ -91,28 +90,32 @@ public class RobotContainer {
 		drivetrain.setDefaultCommand(
 			// Drivetrain will execute this command periodically
 			drivetrain.applyRequest(() ->
-				drive.withVelocityX(joystick.getLeftY() * MaxSpeed * -0.75) // Drive forward with negative Y (forward)
-					.withVelocityY(joystick.getLeftX() * MaxSpeed * -0.75) // Drive left with negative X (left)
-					.withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+				drive.withVelocityX(driverController.getLeftY() * MaxSpeed * -0.75) // Drive forward with negative Y (forward)
+					.withVelocityY(driverController.getLeftX() * MaxSpeed * -0.75) // Drive left with negative X (left)
+					.withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
 			)
 		);
 
-		joystick.options().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+		driverController.options().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+		driverController.square().whileTrue(OTFPathFinding.goToNearestReef(drivetrain));
+		driverController.triangle().whileTrue(OTFPathFinding.goToNearestCoralStation(drivetrain));
 
+		operatorController.povUp().whileTrue(elevator.setElevatorVoltage(Volts.of(2)));
+		operatorController.povLeft().onTrue(ArmElevatorFactory.intakeCoral(elevator, arm));
+		operatorController.povDown().whileTrue(elevator.setElevatorVoltage(Volts.of(-2)));
 
-		joystick.R2().whileTrue(new IntakeCommand(arm));
-		joystick.L2().whileTrue(new OuttakeCommand(arm));
-		joystick.L1().whileTrue(climb.Climb(Volts.of(3.0)));
-		joystick.R1().whileTrue(climb.Climb(Volts.of(-3.0)));
+		operatorController.L2().whileTrue(climb.Climb(Volts.of(3.2)));
+		operatorController.R2().whileTrue(climb.Climb(Volts.of(-3.2)));
 
+		operatorController.L1().whileTrue(new IntakeCommand(arm));
+		operatorController.R1().whileTrue(new OuttakeCommand(arm));
 
+		operatorController.options().onTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L1));
+		operatorController.triangle().onTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L4));
+		operatorController.square().onTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L3));
+		operatorController.circle().onTrue(elevator.setElevatorPosition(ElevatorPosition.INTAKE));
+		operatorController.cross().onTrue(elevator.setElevatorPosition(ElevatorPosition.L2));
 
-		joystick.triangle().whileTrue(ArmElevatorFactory.intakeCoral(elevator, arm));
-		joystick.povUp().whileTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L4));
-		joystick.povLeft().whileTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L3));
-		joystick.povRight().whileTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ScoringPosition.L2));
-		joystick.povDown().whileTrue(elevator.setElevatorPosition(ScoringPosition.HOME));
-		joystick.square().whileTrue(OTFPathFinding.goToNearestReef(drivetrain));
 
 		drivetrain.registerTelemetry(logger::telemeterize);
 	}
