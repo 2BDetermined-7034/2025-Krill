@@ -63,7 +63,6 @@ public class RobotContainer {
 		NamedCommands.registerCommand("intakeCoral", ArmElevatorFactory.intakeCoral(elevator, arm).andThen(new WaitCommand(0.4)));
 		NamedCommands.registerCommand("Spin Intake", arm.spinIntakeCommand());
 
-
 		boolean isCompetition = false;
 
 		// Build an auto chooser. This will use Commands.none() as the default option.
@@ -100,20 +99,21 @@ public class RobotContainer {
 		driverController.square().whileTrue(OTFPathFinding.goToNearestReef(drivetrain));
 		driverController.triangle().whileTrue(OTFPathFinding.goToNearestCoralStation(drivetrain));
 
-		operatorController.povUp().whileTrue(elevator.setElevatorVoltage(Volts.of(2)));
-		operatorController.povLeft().onTrue(ArmElevatorFactory.intakeCoral(elevator, arm));
-		operatorController.povDown().whileTrue(elevator.setElevatorVoltage(Volts.of(-2)));
+		operatorController.povUp().whileTrue(elevator.setElevatorVoltage(Volts.of(2.0)));
+		operatorController.povLeft().whileTrue(ArmElevatorFactory.intakeCoral(elevator, arm));
+		operatorController.povDown().whileTrue(elevator.setElevatorVoltage(Volts.of(-1)));
 
-		operatorController.L2().whileTrue(climb.Climb(Volts.of(3.2)));
-		operatorController.R2().whileTrue(climb.Climb(Volts.of(-3.2)));
+		operatorController.L2().whileTrue(climb.Climb(Volts.of(7)));
+		operatorController.R2().whileTrue(climb.Climb(Volts.of(-7)));
 
-		operatorController.L1().whileTrue(new IntakeCommand(arm));
-		operatorController.R1().whileTrue(new OuttakeCommand(arm));
+		operatorController.R1().whileTrue(new IntakeCommand(arm));
+		operatorController.L1().whileTrue(new OuttakeCommand(arm));
+
 
 		operatorController.options().onTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L1));
 		operatorController.triangle().onTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L4));
 		operatorController.square().onTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L3));
-		operatorController.circle().onTrue(elevator.setElevatorPosition(ElevatorPosition.INTAKE));
+		operatorController.circle().onTrue(elevator.setElevatorPosition(ElevatorPosition.HOME));
 		operatorController.cross().onTrue(elevator.setElevatorPosition(ElevatorPosition.L2));
 
 

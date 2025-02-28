@@ -20,12 +20,12 @@ public class IntakeCommand extends Command {
 	@Override
 	public void initialize() {
 		overcameInitial = false;
-		arm.getIntakeMotor().setControl(new VoltageOut(4.0));
+		arm.getIntakeMotor().setControl(new VoltageOut(8.0));
 	}
 
 	@Override
 	public void execute() {
-		if (arm.getIntakeMotor().getVelocity().getValue().in(Units.RotationsPerSecond) >= 13.0) {
+		if (arm.getIntakeMotor().getVelocity().getValue().in(Units.RotationsPerSecond) >= 30.0) {
 			overcameInitial = true;
 		}
 	}
@@ -38,8 +38,8 @@ public class IntakeCommand extends Command {
 	@Override
 	public boolean isFinished() {
 		if (overcameInitial) {
-			return arm.getIntakeMotor().getTorqueCurrent().getValue().gt(Amps.of(99))
-				&& arm.getIntakeMotor().getVelocity().getValue().abs(RotationsPerSecond) < 2;
+			return arm.getIntakeMotor().getTorqueCurrent().getValue().gt(Amps.of(99));
+//				&& arm.getIntakeMotor().getVelocity().getValue().abs(RotationsPerSecond) < 2;
 		}
 
 		return false;

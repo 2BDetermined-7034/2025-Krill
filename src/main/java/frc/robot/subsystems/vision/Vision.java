@@ -75,8 +75,8 @@ public class Vision {
 				new Rotation3d(Degrees.of(0), Degrees.of(-25.0), Degrees.of(180.0))
 			),
 			PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-			VecBuilder.fill(4.0, 4.0, 0.5),
-			VecBuilder.fill(2.0, 2.0, 0.5)
+			VecBuilder.fill(4.0, 4.0, 1.0),
+			VecBuilder.fill(3.0, 3.0, 1.0)
 		);
 
 

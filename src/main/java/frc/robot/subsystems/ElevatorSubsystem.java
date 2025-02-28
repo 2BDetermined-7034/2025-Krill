@@ -22,12 +22,13 @@ public class ElevatorSubsystem extends SubsystemBase {
 	private final CANcoder canCoder;
 
 	public enum ElevatorPosition {
-		HOME(Rotations.of(0)),
+		HOME(Rotations.of(0.02)),
 		L1(Rotations.of(0.103027)),
-		INTAKE(Rotations.of(0.1)),
+		INTAKE(Rotations.of(0.37)),
 		L2(Rotations.of(0.553223)),
 		L3(Rotations.of(1.222168)),
 		L4(Rotations.of(2.24));
+//		L4(Rotations.of(2.174));
 
 		private final Angle scoringPosition;
 
@@ -108,7 +109,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 		var ccConfig = new CANcoderConfiguration();
 		ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-		ccConfig.MagnetSensor.MagnetOffset = -0.1845703125;
+		ccConfig.MagnetSensor.MagnetOffset = -0.36572265625;
 		canCoder.getConfigurator().apply(ccConfig);
 
 		new Trigger(DriverStation::isEnabled).onTrue(Commands.runOnce(() -> masterMotor.setControl(new CoastOut())));
@@ -166,7 +167,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 		return new FunctionalCommand(
 				() -> masterMotor.setControl(new VoltageOut(volts)),
 				() -> {},
-				(interrupted) -> {},
+				(interrupted) -> {
+					masterMotor.setControl(new MotionMagicVoltage(masterMotor.getPosition().getValue()).withSlot(1));
+				},
 				() -> false
 		);
 	}
