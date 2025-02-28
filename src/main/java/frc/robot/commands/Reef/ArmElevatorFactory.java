@@ -9,10 +9,10 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
 
 public class ArmElevatorFactory {
-	public static Command scoreCoral(CommandSwerveDrivetrain swerveDrivetrain, ElevatorSubsystem elevator, ArmSubsystem arm, ElevatorSubsystem.ScoringPosition scoringPosition) {
+	public static Command scoreCoral(CommandSwerveDrivetrain swerveDrivetrain, ElevatorSubsystem elevator, ArmSubsystem arm, ElevatorSubsystem.ElevatorPosition elevatorPosition) {
 		return new ParallelCommandGroup(
 			Commands.print("Command Starting"),
-			elevator.setElevatorPosition(scoringPosition),
+			elevator.setElevatorPosition(elevatorPosition),
 			arm.setArmAngle(ArmSubsystem.ScoringPosition.Outtake)
 			//OTFPathFinding.goToNearestReef(swerveDrivetrain)
 		);
@@ -21,7 +21,7 @@ public class ArmElevatorFactory {
 	public static Command intakeCoral(ElevatorSubsystem elevator, ArmSubsystem arm) {
 		return new ParallelCommandGroup(
 			Commands.print("intakeCoral Starting"),
-			elevator.setElevatorPosition(ElevatorSubsystem.ScoringPosition.INTAKE),
+			elevator.setElevatorPosition(ElevatorSubsystem.ElevatorPosition.INTAKE),
 			arm.setArmAngle(ArmSubsystem.ScoringPosition.IntakeCoralStation),
 			new IntakeCommand(arm)
 		).andThen(Commands.print("intakeCoral Ended"));

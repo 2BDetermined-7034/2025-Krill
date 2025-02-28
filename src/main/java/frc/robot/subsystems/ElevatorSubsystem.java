@@ -4,10 +4,12 @@ import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -19,7 +21,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 	private final TalonFX masterMotor, slaveMotor;
 	private final CANcoder canCoder;
 
-	public enum ScoringPosition {
+	public enum ElevatorPosition {
 		HOME(Rotations.of(0)),
 		L1(Rotations.of(0.103027)),
 		INTAKE(Rotations.of(0.1)),
@@ -29,7 +31,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 		private final Angle scoringPosition;
 
-		ScoringPosition(Angle scoringPosition) {
+		ElevatorPosition(Angle scoringPosition) {
 			this.scoringPosition = scoringPosition;
 		}
 
@@ -124,7 +126,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 *
+	 * Command to change the elevator position through MotionMagic
 	 * @param angle angle setpoint of the elevator
 	 * @return the command
 	 */
@@ -132,7 +134,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 		return new FunctionalCommand(
 			() -> {
-				if (angle.equals(ScoringPosition.L4.getAngle())) {
+				if (angle.equals(ElevatorPosition.L4.getAngle())) {
 					masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(2));
 				} else if (angle.lt(getElevatorAngle())) {
 					masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(1));
@@ -146,8 +148,27 @@ public class ElevatorSubsystem extends SubsystemBase {
 		);
 	}
 
-	public Command setElevatorPosition(ScoringPosition scoringPosition) {
-		return setElevatorPosition(scoringPosition.getAngle());
+	/**
+	 * Command to change the elevator position through MotionMagic
+	 * @param elevatorPosition the enum position
+	 * @return the command to set the elevator to the position
+	 */
+	public Command setElevatorPosition(ElevatorPosition elevatorPosition) {
+		return setElevatorPosition(elevatorPosition.getAngle());
+	}
+
+	/**
+	 * Command to manually set the elevator motor voltage
+	 * @param volts voltage to set the elevator to
+	 * @return the command
+	 */
+	public Command setElevatorVoltage(Voltage volts) {
+		return new FunctionalCommand(
+				() -> masterMotor.setControl(new VoltageOut(volts)),
+				() -> {},
+				(interrupted) -> {},
+				() -> false
+		);
 	}
 
 }
