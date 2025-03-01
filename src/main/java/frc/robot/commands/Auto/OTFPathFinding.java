@@ -101,7 +101,7 @@ public class OTFPathFinding {
 
         Translation2d reef = isBlue ? blueReef : redReef;
 
-        Distance distFromReef = Meters.of(1.5);
+        Distance distFromReef = Meters.of(1.2);
         Distance distTangent = Inches.of(7);
 
         Angle angleToReef = Rotations.of(drivebase.getPose().getTranslation().minus(reef).getAngle().getRotations());
