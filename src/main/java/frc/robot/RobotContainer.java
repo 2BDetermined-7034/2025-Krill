@@ -111,10 +111,10 @@ public class RobotContainer {
 		for (int i = 0; i < 360; i += 45) {
 			final double angle = (i / -180.0f) * Math.PI;
 			driverController.pov(i).whileTrue(drivetrain.applyRequest(() ->
-				driveCentric.withVelocityX(Math.cos(angle) * 0.3).withVelocityY(Math.sin(angle) * 0.3)
+				driveCentric.withVelocityX(Math.cos(angle) * 0.8 + 0.2).withVelocityY(Math.sin(angle) * 1.0)
 			));
 		}
-
+ 
 		operatorController.povUp().whileTrue(elevator.setElevatorVoltage(Volts.of(2.0)));
 		operatorController.povLeft().whileTrue(ArmElevatorFactory.intakeCoral(elevator, arm));
 		operatorController.povDown().whileTrue(elevator.setElevatorVoltage(Volts.of(-1)));
