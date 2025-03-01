@@ -11,6 +11,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -21,6 +22,7 @@ import frc.robot.commands.Auto.OTFPathFinding;
 import frc.robot.commands.Intake.IntakeCommand;
 import frc.robot.commands.Intake.OuttakeCommand;
 import frc.robot.commands.Reef.ArmElevatorFactory;
+import frc.robot.commands.Swerve.RobotRelativeDriveFactory;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
@@ -75,6 +77,7 @@ public class RobotContainer {
 		);
 
 
+
 		autoChooser.addOption("2m", new PathPlannerAuto("2m"));
 		SmartDashboard.putData("Auto Chooser", autoChooser);
 
@@ -98,6 +101,11 @@ public class RobotContainer {
 		driverController.options().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 		driverController.square().whileTrue(OTFPathFinding.goToNearestReef(drivetrain));
 		driverController.triangle().whileTrue(OTFPathFinding.goToNearestCoralStation(drivetrain));
+
+//		driverController.povUp().whileTrue(RobotRelativeDriveFactory.robotRelativeDrive(drivetrain, 1.0, 0.0));
+//		driverController.povDown().whileTrue(RobotRelativeDriveFactory.robotRelativeDrive(drivetrain, -1.0, 0.0));
+//		driverController.povLeft().whileTrue(RobotRelativeDriveFactory.robotRelativeDrive(drivetrain, 0.0, 1.0));
+//		driverController.povRight().whileTrue(RobotRelativeDriveFactory.robotRelativeDrive(drivetrain, 0.0, -1.0));
 
 		operatorController.povUp().whileTrue(elevator.setElevatorVoltage(Volts.of(2.0)));
 		operatorController.povLeft().whileTrue(ArmElevatorFactory.intakeCoral(elevator, arm));
