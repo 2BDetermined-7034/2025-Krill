@@ -18,11 +18,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.Auto.OTFPathFinding;
 import frc.robot.commands.Intake.IntakeCommand;
 import frc.robot.commands.Intake.OuttakeCommand;
 import frc.robot.commands.Reef.ArmElevatorFactory;
-import frc.robot.commands.Swerve.RobotRelativeDriveFactory;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
@@ -39,6 +39,11 @@ public class RobotContainer {
 	private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
 		.withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
 		.withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+
+	private final SwerveRequest.RobotCentric drive1 = new SwerveRequest.RobotCentric()
+		.withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+		.withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+
 	private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 	private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
@@ -102,10 +107,12 @@ public class RobotContainer {
 		driverController.square().whileTrue(OTFPathFinding.goToNearestReef(drivetrain));
 		driverController.triangle().whileTrue(OTFPathFinding.goToNearestCoralStation(drivetrain));
 
-//		driverController.povUp().whileTrue(RobotRelativeDriveFactory.robotRelativeDrive(drivetrain, 1.0, 0.0));
-//		driverController.povDown().whileTrue(RobotRelativeDriveFactory.robotRelativeDrive(drivetrain, -1.0, 0.0));
-//		driverController.povLeft().whileTrue(RobotRelativeDriveFactory.robotRelativeDrive(drivetrain, 0.0, 1.0));
-//		driverController.povRight().whileTrue(RobotRelativeDriveFactory.robotRelativeDrive(drivetrain, 0.0, -1.0));
+		for (int i = 0; i < 360; i += 45) {
+			final double angle = (i / -180.0f) * Math.PI;
+			driverController.pov(i).whileTrue(drivetrain.applyRequest(() ->
+				drive1.withVelocityX(Math.cos(angle)).withVelocityY(Math.sin(angle))
+			));
+		}
 
 		operatorController.povUp().whileTrue(elevator.setElevatorVoltage(Volts.of(2.0)));
 		operatorController.povLeft().whileTrue(ArmElevatorFactory.intakeCoral(elevator, arm));
