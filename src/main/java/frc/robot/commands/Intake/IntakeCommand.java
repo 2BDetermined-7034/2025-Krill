@@ -21,7 +21,7 @@ public class IntakeCommand extends Command {
 	@Override
 	public void initialize() {
 		overcameInitial = false;
-		arm.getIntakeMotor().setControl(new TorqueCurrentFOC(50.0));
+		arm.getIntakeMotor().setControl(new TorqueCurrentFOC(60.0));
 		time = HALUtil.getFPGATime();
 	}
 

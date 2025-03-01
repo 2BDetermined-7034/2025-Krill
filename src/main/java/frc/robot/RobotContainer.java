@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.Auto.OTFPathFinding;
 import frc.robot.commands.Intake.IntakeCommand;
 import frc.robot.commands.Intake.OuttakeCommand;
@@ -40,7 +39,7 @@ public class RobotContainer {
 		.withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
 		.withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
-	private final SwerveRequest.RobotCentric drive1 = new SwerveRequest.RobotCentric()
+	private final SwerveRequest.RobotCentric driveCentric = new SwerveRequest.RobotCentric()
 		.withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
 		.withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
@@ -112,7 +111,7 @@ public class RobotContainer {
 		for (int i = 0; i < 360; i += 45) {
 			final double angle = (i / -180.0f) * Math.PI;
 			driverController.pov(i).whileTrue(drivetrain.applyRequest(() ->
-				drive1.withVelocityX(Math.cos(angle)).withVelocityY(Math.sin(angle))
+				driveCentric.withVelocityX(Math.cos(angle) * 0.3).withVelocityY(Math.sin(angle) * 0.3)
 			));
 		}
 

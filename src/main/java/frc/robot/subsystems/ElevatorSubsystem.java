@@ -24,7 +24,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 	public enum ElevatorPosition {
 		HOME(Rotations.of(0.02)),
 		L1(Rotations.of(0.103027)),
-		INTAKE(Rotations.of(0.32							)),
+		INTAKE(Rotations.of(0.30							)),
 		L2(Rotations.of(0.553223)),
 		L3(Rotations.of(1.222168)),
 		L4(Rotations.of(2.24));
@@ -57,7 +57,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 		upConfig.GravityType = GravityTypeValue.Elevator_Static;
 		upConfig.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 		upConfig.kS = 0.38;
-		upConfig.kV = 0.45;
+		upConfig.kV = 0.5;
 		upConfig.kA = 0.0;
 		upConfig.kG = 0.45;
 		upConfig.kP = 3;
@@ -70,7 +70,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 		downConfig.kS = 0.38;
 		downConfig.kV = 0.3;
 		downConfig.kA = 0.0;
-		downConfig.kG = 0.65;
+		downConfig.kG = 0.8;
 		downConfig.kP = 5;
 		downConfig.kI = 0.0;
 		downConfig.kD = 1;
@@ -78,12 +78,12 @@ public class ElevatorSubsystem extends SubsystemBase {
 		Slot2Configs level4Config = talonFXConfigs.Slot2;
 		level4Config.GravityType = GravityTypeValue.Elevator_Static;
 		level4Config.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
-		level4Config.kS = 0.5;
+		level4Config.kS = 0.55;
 		level4Config.kV = 0.45;
 		level4Config.kA = 0.0;
-		level4Config.kG = 0.45;
+		level4Config.kG = 0.7;
 		level4Config.kP = 3;
-		level4Config.kI = 0.7;
+		level4Config.kI = 0.8;
 		level4Config.kD = 0.5;
 
 
