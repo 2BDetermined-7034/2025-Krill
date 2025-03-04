@@ -11,6 +11,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -37,6 +38,11 @@ public class RobotContainer {
 	private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
 		.withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
 		.withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+
+	private final SwerveRequest.RobotCentric driveCentric = new SwerveRequest.RobotCentric()
+		.withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+		.withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+
 	private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 	private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
@@ -63,7 +69,6 @@ public class RobotContainer {
 		NamedCommands.registerCommand("intakeCoral", ArmElevatorFactory.intakeCoral(elevator, arm).andThen(new WaitCommand(0.4)));
 		NamedCommands.registerCommand("Spin Intake", arm.spinIntakeCommand());
 
-
 		boolean isCompetition = false;
 
 		// Build an auto chooser. This will use Commands.none() as the default option.
@@ -74,6 +79,7 @@ public class RobotContainer {
 				? stream.filter(auto -> auto.getName().startsWith("comp"))
 				: stream
 		);
+
 
 
 		autoChooser.addOption("2m", new PathPlannerAuto("2m"));
@@ -94,26 +100,36 @@ public class RobotContainer {
 					.withVelocityY(driverController.getLeftX() * MaxSpeed * -0.75) // Drive left with negative X (left)
 					.withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
 			)
+
+
 		);
 
 		driverController.options().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 		driverController.square().whileTrue(OTFPathFinding.goToNearestReef(drivetrain));
 		driverController.triangle().whileTrue(OTFPathFinding.goToNearestCoralStation(drivetrain));
 
-		operatorController.povUp().whileTrue(elevator.setElevatorVoltage(Volts.of(2)));
-		operatorController.povLeft().onTrue(ArmElevatorFactory.intakeCoral(elevator, arm));
-		operatorController.povDown().whileTrue(elevator.setElevatorVoltage(Volts.of(-2)));
+		for (int i = 0; i < 360; i += 45) {
+			final double angle = (i / -180.0f) * Math.PI;
+			driverController.pov(i).whileTrue(drivetrain.applyRequest(() ->
+				driveCentric.withVelocityX(Math.cos(angle) * 0.8 + 0.2).withVelocityY(Math.sin(angle) * 1.0)
+			));
+		}
+ 
+		operatorController.povUp().whileTrue(elevator.setElevatorVoltage(Volts.of(2.0)));
+		operatorController.povLeft().whileTrue(ArmElevatorFactory.intakeCoral(elevator, arm));
+		operatorController.povDown().whileTrue(elevator.setElevatorVoltage(Volts.of(-1)));
 
-		operatorController.L2().whileTrue(climb.Climb(Volts.of(3.2)));
-		operatorController.R2().whileTrue(climb.Climb(Volts.of(-3.2)));
+		operatorController.L2().whileTrue(climb.Climb(Volts.of(7)));
+		operatorController.R2().whileTrue(climb.Climb(Volts.of(-7)));
 
-		operatorController.L1().whileTrue(new IntakeCommand(arm));
-		operatorController.R1().whileTrue(new OuttakeCommand(arm));
+		operatorController.R1().whileTrue(new IntakeCommand(arm));
+		operatorController.L1().whileTrue(new OuttakeCommand(arm));
+
 
 		operatorController.options().onTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L1));
 		operatorController.triangle().onTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L4));
 		operatorController.square().onTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L3));
-		operatorController.circle().onTrue(elevator.setElevatorPosition(ElevatorPosition.INTAKE));
+		operatorController.circle().onTrue(elevator.setElevatorPosition(ElevatorPosition.HOME));
 		operatorController.cross().onTrue(elevator.setElevatorPosition(ElevatorPosition.L2));
 
 

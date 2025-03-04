@@ -24,8 +24,8 @@ public class ArmSubsystem extends SubsystemBase {
 
 
 	public enum ScoringPosition {
-		Outtake(Rotations.of(-0.056895)),
-		IntakeCoralStation(Rotations.of(0.076));
+		Outtake(Rotations.of(-0.07)),
+		IntakeCoralStation(Degrees.of(36.0));
 		private final Angle armAngle;
 
 		ScoringPosition(Angle armAngle) {
