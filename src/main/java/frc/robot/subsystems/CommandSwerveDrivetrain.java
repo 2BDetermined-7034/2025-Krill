@@ -285,7 +285,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     ),
                     new PPHolonomicDriveController(
                             // PID constants for translation
-                            new PIDConstants(8, 0, 0),
+                            new PIDConstants(10, 0, 0),
                             // PID constants for rotation
                             new PIDConstants(7, 0, 0)
                     ),
@@ -340,8 +340,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Command driveToPose(Pose2d pose) {
         // Create the constraints to use while pathfinding
         PathConstraints constraints = new PathConstraints(
-                TunerConstants.kSpeedAt12Volts, MetersPerSecondPerSecond.of(2.5),
-                DegreesPerSecond.of(540), DegreesPerSecondPerSecond.of(540));
+                TunerConstants.kSpeedAt12Volts, MetersPerSecondPerSecond.of(3),
+                DegreesPerSecond.of(540), DegreesPerSecondPerSecond.of(720));
 
         // Since AutoBuilder is configured, we can use it to build pathfinding commands
         return AutoBuilder.pathfindToPose(
