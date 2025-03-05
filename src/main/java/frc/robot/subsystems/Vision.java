@@ -1,4 +1,4 @@
-package frc.robot.subsystems.vision;
+package frc.robot.subsystems;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -9,8 +9,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.subsystems.vision.VisionPoseMeasurement;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -56,7 +55,12 @@ public class Vision {
 		return measurementWithTimeStamps;
 	}
 
-	enum Cameras {
+	public void toggleDriverMode(Cameras camera) {
+		boolean isDriverMode = camera.getPhotonCamera().getDriverMode();
+		camera.getPhotonCamera().setDriverMode(!isDriverMode);
+	}
+
+	public enum Cameras {
 		FRONT_CAM(
 			"front",
 			new Transform3d(

@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
-import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionPoseMeasurement;
 
 import java.util.function.Supplier;
@@ -51,7 +50,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * Swerve request to apply during robot-centric path following
      */
     private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
-    private final Vision vision = new Vision();
+    private final frc.robot.subsystems.Vision vision = new Vision();
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
     private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
             new SysIdRoutine.Config(
@@ -225,6 +224,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
         return m_sysIdRoutineToApply.dynamic(direction);
     }
+
+    public Command toggleDriverMode(){
+        return Commands.runOnce(()-> vision.toggleDriverMode(Vision.Cameras.FRONT_CAM));
+    }
+
 
     @Override
     public void periodic() {

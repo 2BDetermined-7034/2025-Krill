@@ -24,7 +24,7 @@ public class IntakeCommand extends Command {
 	@Override
 	public void initialize() {
 		overcameInitial = false;
-		arm.getIntakeMotor().setControl(new TorqueCurrentFOC(60.0));
+		arm.getIntakeMotor().setControl(new TorqueCurrentFOC(50.0));
 		time = 0L;
 	}
 
