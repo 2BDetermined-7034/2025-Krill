@@ -4,68 +4,53 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
-
-import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
 import frc.robot.commands.Auto.OTFPathFinding;
 import frc.robot.commands.Intake.IntakeCommand;
 import frc.robot.commands.Intake.OuttakeCommand;
 import frc.robot.commands.Reef.ArmElevatorFactory;
-import frc.robot.commands.SysId;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.*;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.ClimbSubsystem;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem.ElevatorPosition;
 
-import java.util.Set;
+import static edu.wpi.first.units.Units.*;
 
 
 public class RobotContainer {
+	public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+	public final ArmSubsystem arm = new ArmSubsystem();
+	public final ElevatorSubsystem elevator = new ElevatorSubsystem();
+	public final ClimbSubsystem climb = new ClimbSubsystem();
 	private final double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
 	private final double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
-
 	/* Setting up bindings for necessary control of the swerve drive platform */
 	private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
 		.withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
 		.withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-
 	private final SwerveRequest.RobotCentric driveCentric = new SwerveRequest.RobotCentric()
 		.withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
 		.withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-
 	private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 	private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
-
 	private final Telemetry logger = new Telemetry(MaxSpeed);
-
-	private SendableChooser<Command> autoChooser;
-
 	//private final CommandXboxController joystick = new CommandXboxController(0);
 	private final CommandPS5Controller driverController = new CommandPS5Controller(0);
 	private final CommandPS5Controller operatorController = new CommandPS5Controller(1);
-
 	private final CommandXboxController visionTester = new CommandXboxController(2);
-
-	public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-
-	public final ArmSubsystem arm = new ArmSubsystem();
-	public final ElevatorSubsystem elevator = new ElevatorSubsystem();
-	public final ClimbSubsystem climb = new ClimbSubsystem();
+	private final SendableChooser<Command> autoChooser;
 
 	public RobotContainer() {
 
@@ -88,7 +73,6 @@ public class RobotContainer {
 				? stream.filter(auto -> auto.getName().startsWith("comp"))
 				: stream
 		);
-
 
 
 		autoChooser.addOption("2m", new PathPlannerAuto("2m"));
@@ -123,7 +107,6 @@ public class RobotContainer {
 
 
 		);
-		visionTester.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
 //		driverController.options().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 		driverController.square().whileTrue(OTFPathFinding.goToNearestReef(drivetrain));
@@ -138,7 +121,7 @@ public class RobotContainer {
 				driveCentric.withVelocityX(Math.cos(angle) * 0.8 + 0.2).withVelocityY(Math.sin(angle) * 1.0)
 			));
 		}
- 
+
 		operatorController.povUp().whileTrue(elevator.setElevatorVoltage(Volts.of(2.0)));
 		operatorController.povLeft().whileTrue(ArmElevatorFactory.intakeCoral(elevator, arm));
 		operatorController.povDown().whileTrue(elevator.setElevatorVoltage(Volts.of(-1)));
@@ -158,15 +141,6 @@ public class RobotContainer {
 //
 //
 		drivetrain.registerTelemetry(logger::telemeterize);
-
-		//TEMP
-		visionTester.y().onTrue(arm.setArmAngle(ArmSubsystem.ScoringPosition.Outtake));
-		visionTester.b().onTrue(arm.setArmAngle(ArmSubsystem.ScoringPosition.IntakeCoralStation));
-//		visionTester.x().onTrue(drivetrain.toggleDriverMode());
-//		visionTester.rightTrigger().whileTrue(new IntakeCommand(arm));
-//		visionTester.leftTrigger().whileTrue(new OuttakeCommand(arm));
-		visionTester.povUp().whileTrue(climb.Climb(Volts.of(6)));
-		visionTester.povDown().whileTrue(climb.Climb(Volts.of(-6)));
 
 	}
 
