@@ -28,6 +28,24 @@
           "data": {
             "name": "1s Outtake"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Elevator Ground"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "E-RC"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intakeCoral"
+          }
         }
       ]
     }

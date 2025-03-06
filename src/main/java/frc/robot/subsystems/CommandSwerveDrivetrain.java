@@ -9,7 +9,10 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,6 +32,7 @@ import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionPoseMeasurement;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 import static edu.wpi.first.units.Units.*;
@@ -109,7 +113,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             )
     );
     /* The SysId routine to test */
-    private final SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineRotation;
+    private final SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineSteer;
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
     /* Keep track if we've ever applied the operator perspective before or not */
@@ -350,6 +354,26 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 MetersPerSecond.of(0.0) // Goal end velocity in meters/sec
         ).andThen(() -> SmartDashboard.putBoolean("Pathfind finished", true));
     }
+
+    public Command driveToPose(List<Pose2d> poses) {
+        List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(poses);
+        // Create the constraints to use while pathfinding
+        PathConstraints constraints = new PathConstraints(
+            TunerConstants.kSpeedAt12Volts, MetersPerSecondPerSecond.of(2.5),
+            DegreesPerSecond.of(540), DegreesPerSecondPerSecond.of(540));
+
+        // Since AutoBuilder is configured, we can use it to build pathfinding commands
+        PathPlannerPath path = new PathPlannerPath(
+            waypoints,
+            constraints,
+            null,
+            new GoalEndState(0.0, poses.get(poses.size()-1).getRotation()) // Goal end velocity in meters/sec
+        );
+        path.preventFlipping = true;
+
+
+		return AutoBuilder.followPath(path);
+	}
 
     public Pose2d getPose() {
         return super.getState().Pose;
