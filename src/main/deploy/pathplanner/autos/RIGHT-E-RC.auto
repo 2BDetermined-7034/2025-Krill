@@ -32,13 +32,32 @@
         {
           "type": "named",
           "data": {
+            "name": "Flick Outtake"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Elevator Ground"
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "E-RC"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "E-RC"
+                }
+              }
+            ]
           }
         },
         {
