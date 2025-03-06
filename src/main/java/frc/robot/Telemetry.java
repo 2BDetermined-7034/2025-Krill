@@ -3,6 +3,7 @@ package frc.robot;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -98,7 +99,7 @@ public class Telemetry {
         m_poseArray[1] = state.Pose.getY();
         m_poseArray[2] = state.Pose.getRotation().getDegrees();
         for (int i = 0; i < 4; ++i) {
-            m_moduleStatesArray[i*2 + 0] = state.ModuleStates[i].angle.getRadians();
+            m_moduleStatesArray[i*2 + 0] = MathUtil.angleModulus(state.ModuleStates[i].angle.getRadians());
             m_moduleStatesArray[i*2 + 1] = state.ModuleStates[i].speedMetersPerSecond;
             m_moduleTargetsArray[i*2 + 0] = state.ModuleTargets[i].angle.getRadians();
             m_moduleTargetsArray[i*2 + 1] = state.ModuleTargets[i].speedMetersPerSecond;
@@ -120,6 +121,8 @@ public class Telemetry {
             m_moduleSpeeds[i].setLength(state.ModuleStates[i].speedMetersPerSecond / (2 * MaxSpeed));
 
             SmartDashboard.putData("Module " + i, m_moduleMechanisms[i]);
+            SmartDashboard.putNumber("Module " + i + " position", MathUtil.angleModulus(state.ModuleTargets[i].angle.getRadians()));
+            SmartDashboard.putNumber("Module " + i + " target", MathUtil.angleModulus(state.ModulePositions[i].angle.getRadians()));
         }
     }
 }
