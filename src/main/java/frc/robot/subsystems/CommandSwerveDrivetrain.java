@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
-import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionPoseMeasurement;
 
 import java.util.List;
@@ -55,7 +54,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * Swerve request to apply during robot-centric path following
      */
     private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
-    private final Vision vision = new Vision();
+    private final frc.robot.subsystems.Vision vision = new Vision();
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
     private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
             new SysIdRoutine.Config(
@@ -230,6 +229,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_sysIdRoutineToApply.dynamic(direction);
     }
 
+    public Command toggleDriverMode(){
+        return Commands.runOnce(()-> vision.toggleDriverMode(Vision.Cameras.FRONT_CAM));
+    }
+
+
     @Override
     public void periodic() {
         var measurements = vision.getVisionPoseMeasurements();
@@ -289,7 +293,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     ),
                     new PPHolonomicDriveController(
                             // PID constants for translation
-                            new PIDConstants(8, 0, 0),
+                            new PIDConstants(10, 0, 0),
                             // PID constants for rotation
                             new PIDConstants(7, 0, 0)
                     ),
@@ -344,8 +348,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Command driveToPose(Pose2d pose) {
         // Create the constraints to use while pathfinding
         PathConstraints constraints = new PathConstraints(
-                TunerConstants.kSpeedAt12Volts, MetersPerSecondPerSecond.of(2.5),
-                DegreesPerSecond.of(540), DegreesPerSecondPerSecond.of(540));
+                TunerConstants.kSpeedAt12Volts, MetersPerSecondPerSecond.of(3),
+                DegreesPerSecond.of(540), DegreesPerSecondPerSecond.of(720));
 
         // Since AutoBuilder is configured, we can use it to build pathfinding commands
         return AutoBuilder.pathfindToPose(

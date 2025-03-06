@@ -18,7 +18,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+
 import frc.robot.commands.Auto.OTFPathFinding;
 import frc.robot.commands.Intake.IntakeCommand;
 import frc.robot.commands.Intake.OuttakeCommand;
@@ -54,6 +58,8 @@ public class RobotContainer {
 	//private final CommandXboxController joystick = new CommandXboxController(0);
 	private final CommandPS5Controller driverController = new CommandPS5Controller(0);
 	private final CommandPS5Controller operatorController = new CommandPS5Controller(1);
+
+	private final CommandXboxController visionTester = new CommandXboxController(2);
 
 	public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
@@ -96,22 +102,35 @@ public class RobotContainer {
 	private void configureBindings() {
 		// Note that X is defined as forward according to WPILib convention,
 		// and Y is defined as to the left according to WPILib convention.
+//		drivetrain.setDefaultCommand(
+//			// Drivetrain will execute this command periodically
+//			drivetrain.applyRequest(() ->
+//				drive.withVelocityX(driverController.getLeftY() * MaxSpeed * -0.75) // Drive forward with negative Y (forward)
+//					.withVelocityY(driverController.getLeftX() * MaxSpeed * -0.75) // Drive left with negative X (left)
+//					.withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+//			)
+//
+//
+//		);
+
 		drivetrain.setDefaultCommand(
 			// Drivetrain will execute this command periodically
 			drivetrain.applyRequest(() ->
-				drive.withVelocityX(driverController.getLeftY() * MaxSpeed * -0.75) // Drive forward with negative Y (forward)
-					.withVelocityY(driverController.getLeftX() * MaxSpeed * -0.75) // Drive left with negative X (left)
-					.withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+				drive.withVelocityX(-visionTester.getLeftY() * MaxSpeed * -0.75) // Drive forward with negative Y (forward)
+					.withVelocityY(visionTester.getLeftX() * MaxSpeed * -0.75) // Drive left with negative X (left)
+					.withRotationalRate(-visionTester.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
 			)
 
 
 		);
+		visionTester.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
-		driverController.options().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+//		driverController.options().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 		driverController.square().whileTrue(OTFPathFinding.goToNearestReef(drivetrain));
 		driverController.triangle().whileTrue(OTFPathFinding.goToNearestCoralStation(drivetrain));
 //
 //
+
 
 		for (int i = 0; i < 360; i += 45) {
 			final double angle = (i / -180.0f) * Math.PI;
@@ -139,6 +158,16 @@ public class RobotContainer {
 //
 //
 		drivetrain.registerTelemetry(logger::telemeterize);
+
+		//TEMP
+		visionTester.y().onTrue(arm.setArmAngle(ArmSubsystem.ScoringPosition.Outtake));
+		visionTester.b().onTrue(arm.setArmAngle(ArmSubsystem.ScoringPosition.IntakeCoralStation));
+//		visionTester.x().onTrue(drivetrain.toggleDriverMode());
+//		visionTester.rightTrigger().whileTrue(new IntakeCommand(arm));
+//		visionTester.leftTrigger().whileTrue(new OuttakeCommand(arm));
+		visionTester.povUp().whileTrue(climb.Climb(Volts.of(6)));
+		visionTester.povDown().whileTrue(climb.Climb(Volts.of(-6)));
+
 	}
 
 	public Command getAutonomousCommand() {

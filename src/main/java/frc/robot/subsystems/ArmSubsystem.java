@@ -24,8 +24,8 @@ public class ArmSubsystem extends SubsystemBase {
 
 
 	public enum ScoringPosition {
-		Outtake(Rotations.of(-0.07)),
-		IntakeCoralStation(Degrees.of(36.0));
+		Outtake(Rotations.of(-0.068)),
+		IntakeCoralStation(Rotations.of(0.1));
 		private final Angle armAngle;
 
 		ScoringPosition(Angle armAngle) {
@@ -43,28 +43,33 @@ public class ArmSubsystem extends SubsystemBase {
 		intakeMotor = new TalonFX(INTAKE_MOTOR_ID, "rio");
 		canCoder = new CANcoder(CANCODER_ID, "rio");
 
-		var talonFXConfiguration = new TalonFXConfiguration();
+		var talonFXConfigs = new TalonFXConfiguration();
 
 
-		Slot0Configs slotConfigs = talonFXConfiguration.Slot0;
+		Slot0Configs slotConfigs = talonFXConfigs.Slot0;
 		slotConfigs.GravityType = GravityTypeValue.Arm_Cosine;
 		slotConfigs.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
-		slotConfigs.kA = 0;
-		slotConfigs.kG = 0.4;
-		slotConfigs.kV = 0;
+		slotConfigs.kA = 0.01;
+		slotConfigs.kG = 0.42;
+		slotConfigs.kV = 0.44;
 		slotConfigs.kS = 0.35;
-		slotConfigs.kP = 24;
-		slotConfigs.kI = 15;
+		slotConfigs.kP = 5;
+		slotConfigs.kI = 5;
 		slotConfigs.kD = 1;
 
-		talonFXConfiguration.Feedback.FeedbackRemoteSensorID = CANCODER_ID;
-		talonFXConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-		talonFXConfiguration.Feedback.RotorToSensorRatio = GEAR_RATIO;
-		talonFXConfiguration.Feedback.SensorToMechanismRatio = 1.0;
-		talonFXConfiguration.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-		talonFXConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-		talonFXConfiguration.CurrentLimits.SupplyCurrentLimit = ARM_CURRENT_LIMIT.in(Amps);
-		armMotor.getConfigurator().apply(talonFXConfiguration);
+		var motionMagicConfigs = talonFXConfigs.MotionMagic;
+		motionMagicConfigs.MotionMagicCruiseVelocity = 1.5;
+		motionMagicConfigs.MotionMagicAcceleration = 3;
+		motionMagicConfigs.MotionMagicJerk = 0;
+
+		talonFXConfigs.Feedback.FeedbackRemoteSensorID = CANCODER_ID;
+		talonFXConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+		talonFXConfigs.Feedback.RotorToSensorRatio = GEAR_RATIO;
+		talonFXConfigs.Feedback.SensorToMechanismRatio = 1.0;
+		talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+		talonFXConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+		talonFXConfigs.CurrentLimits.SupplyCurrentLimit = ARM_CURRENT_LIMIT.in(Amps);
+		armMotor.getConfigurator().apply(talonFXConfigs);
 
 
 		var ccConfig = new CANcoderConfiguration();
@@ -93,7 +98,7 @@ public class ArmSubsystem extends SubsystemBase {
 
 	public Command setArmAngle(Angle position) {
 		return new FunctionalCommand(
-			() -> armMotor.setControl(new PositionVoltage(clamp(position, MIN_POSITION, MAX_POSITION))),
+			() -> armMotor.setControl(new MotionMagicVoltage(clamp(position, MIN_POSITION, MAX_POSITION))),
 			() -> {},
 			(interrupted) -> {},
 			() -> true

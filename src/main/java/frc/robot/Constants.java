@@ -11,16 +11,15 @@ public class Constants {
 		public static final int INTAKE_MOTOR_ID = 16;
 		public static final int CANCODER_ID = 15;
 
-		public static final double CANCODER_OFFSET = 0.164794921875;
+		public static final double CANCODER_OFFSET = 0.23974609375;
 
 		public static final double GEAR_RATIO = 9.0;
-
 
 		public static final Current ARM_CURRENT_LIMIT = Amps.of(60.0);
 		public static final Current INTAKE_CURRENT_LIMIT = Amps.of(60.0);
 
 		public static final Angle MIN_POSITION = Rotations.of(-0.08);
-		public static final Angle MAX_POSITION = Rotations.of(0.15);
+		public static final Angle MAX_POSITION = Rotations.of(0.17);
 	}
 
 	public static final class Elevator {
