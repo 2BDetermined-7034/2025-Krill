@@ -116,7 +116,7 @@ public class RobotContainer {
 		operatorController.povUp().whileTrue(elevator.setElevatorVoltage(Volts.of(2.0)));
 		operatorController.povLeft().whileTrue(ArmElevatorFactory.intakeCoral(elevator, arm));
 		operatorController.povDown().whileTrue(elevator.setElevatorVoltage(Volts.of(-1)));
-		operatorController.povRight().onTrue(arm.setArmAngle(ArmSubsystem.ScoringPosition.OuttakeFlick));
+		operatorController.povRight().onTrue(arm.setArmAngle(ArmSubsystem.ScoringPosition.IntakeCoralStation));
 
 		operatorController.L2().whileTrue(climb.Climb(Volts.of(7)));
 		operatorController.R2().whileTrue(climb.Climb(Volts.of(-7)));
@@ -129,7 +129,7 @@ public class RobotContainer {
 		operatorController.triangle().onTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L4));
 		operatorController.square().onTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L3));
 		operatorController.circle().onTrue(elevator.setElevatorPosition(ElevatorPosition.HOME));
-		operatorController.cross().onTrue(elevator.setElevatorPosition(ElevatorPosition.L2));
+		operatorController.cross().onTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L2));
 //
 //
 		drivetrain.registerTelemetry(logger::telemeterize);

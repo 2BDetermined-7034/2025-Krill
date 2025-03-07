@@ -55,10 +55,6 @@ public class Vision {
 		return measurementWithTimeStamps;
 	}
 
-	public void toggleDriverMode(Cameras camera) {
-		boolean isDriverMode = camera.getPhotonCamera().getDriverMode();
-		camera.getPhotonCamera().setDriverMode(!isDriverMode);
-	}
 
 	public enum Cameras {
 		FRONT_CAM(

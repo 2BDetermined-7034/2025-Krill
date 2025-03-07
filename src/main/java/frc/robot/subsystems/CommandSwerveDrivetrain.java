@@ -229,9 +229,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_sysIdRoutineToApply.dynamic(direction);
     }
 
-    public Command toggleDriverMode(){
-        return Commands.runOnce(()-> vision.toggleDriverMode(Vision.Cameras.FRONT_CAM));
-    }
 
 
     @Override
