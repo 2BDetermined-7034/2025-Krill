@@ -25,7 +25,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 	public enum ElevatorPosition {
 		HOME(Rotations.of(0.02)),
 		L1(Rotations.of(0.103027)),
-		INTAKE(Rotations.of(0.33)),
+		INTAKE(Rotations.of(0.29)),
 		L2(Rotations.of(0.553223)),
 		L3(Rotations.of(1.222168)),
 		L4(Rotations.of(2.24));
@@ -60,9 +60,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 		upConfig.kS = 0.38;
 		upConfig.kV = 0.5;
 		upConfig.kA = 0.0;
-		upConfig.kG = 0.45;
+		upConfig.kG = 0.7;
 		upConfig.kP = 3;
-		upConfig.kI = 0.7;
+		upConfig.kI = 5.0;
 		upConfig.kD = 0.5;
 
 		Slot1Configs downConfig = talonFXConfigs.Slot1;
@@ -71,7 +71,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 		downConfig.kS = 0.38;
 		downConfig.kV = 0.35;
 		downConfig.kA = 0.0;
-		downConfig.kG = 0.7;
+		downConfig.kG = 0.6;
 		downConfig.kP = 5;
 		downConfig.kI = 0.0;
 		downConfig.kD = 1;
@@ -138,10 +138,13 @@ public class ElevatorSubsystem extends SubsystemBase {
 			() -> {
 				if (angle.equals(ElevatorPosition.L4.getAngle())) {
 					masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(2));
+					System.out.println("SLOT2");
 				} else if (angle.lt(getElevatorAngle())) {
 					masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(1));
+					System.out.println("SLOT1");
 				} else {
 					masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(0));
+					System.out.println("SLOT0");
 				}
 			},
 			() -> {},

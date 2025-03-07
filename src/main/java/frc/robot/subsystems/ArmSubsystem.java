@@ -73,10 +73,10 @@ public class ArmSubsystem extends SubsystemBase {
 		armMotor.getConfigurator().apply(talonFXConfigs);
 
 
-//		var ccConfig = new CANcoderConfiguration();
-////		ccConfig.MagnetSensor.MagnetOffset = CANCODER_OFFSET - /*Degrees.of(24.2).in(Rotations)*/;
-//		ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-//		canCoder.getConfigurator().apply(ccConfig);
+		var ccConfig = new CANcoderConfiguration();
+		ccConfig.MagnetSensor.MagnetOffset = CANCODER_OFFSET - Degrees.of(24.2).in(Rotations);
+		ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+		canCoder.getConfigurator().apply(ccConfig);
 
 	}
 
