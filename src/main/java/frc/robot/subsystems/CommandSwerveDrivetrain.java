@@ -229,9 +229,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_sysIdRoutineToApply.dynamic(direction);
     }
 
-    public Command toggleDriverMode(){
-        return Commands.runOnce(()-> vision.toggleDriverMode(Vision.Cameras.FRONT_CAM));
-    }
 
 
     @Override
@@ -293,7 +290,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     ),
                     new PPHolonomicDriveController(
                             // PID constants for translation
-                            new PIDConstants(10, 0, 0),
+                            new PIDConstants(14, 0, 0),
                             // PID constants for rotation
                             new PIDConstants(7, 0, 0)
                     ),

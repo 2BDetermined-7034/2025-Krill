@@ -20,11 +20,12 @@ import static frc.robot.Constants.Elevator.*;
 public class ElevatorSubsystem extends SubsystemBase {
 	private final TalonFX masterMotor, slaveMotor;
 	private final CANcoder canCoder;
+	private Angle targetPosition;
 
 	public enum ElevatorPosition {
 		HOME(Rotations.of(0.02)),
 		L1(Rotations.of(0.103027)),
-		INTAKE(Rotations.of(0.30)),
+		INTAKE(Rotations.of(0.33)),
 		L2(Rotations.of(0.553223)),
 		L3(Rotations.of(1.222168)),
 		L4(Rotations.of(2.24));
@@ -68,9 +69,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 		downConfig.GravityType = GravityTypeValue.Elevator_Static;
 		downConfig.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 		downConfig.kS = 0.38;
-		downConfig.kV = 0.3;
+		downConfig.kV = 0.35;
 		downConfig.kA = 0.0;
-		downConfig.kG = 0.8;
+		downConfig.kG = 0.7;
 		downConfig.kP = 5;
 		downConfig.kI = 0.0;
 		downConfig.kD = 1;
@@ -109,11 +110,12 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 		var ccConfig = new CANcoderConfiguration();
 		ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-		ccConfig.MagnetSensor.MagnetOffset = -0.39892578125;
+		ccConfig.MagnetSensor.MagnetOffset = -0.296142578125;
 		canCoder.getConfigurator().apply(ccConfig);
 
 		new Trigger(DriverStation::isEnabled).onTrue(Commands.runOnce(() -> masterMotor.setControl(new CoastOut())));
 
+		targetPosition = ElevatorPosition.HOME.getAngle();
 	}
 
 	@Override
@@ -132,7 +134,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 	 * @return the command
 	 */
 	public Command setElevatorPosition(Angle angle) {
-
 		return new FunctionalCommand(
 			() -> {
 				if (angle.equals(ElevatorPosition.L4.getAngle())) {
@@ -174,4 +175,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 		);
 	}
 
+	public boolean isAtSetpoint() {
+//		return getElevatorAngle().isNear(targetPosition, Rotations.of(0.1));
+		return true;
+	}
 }

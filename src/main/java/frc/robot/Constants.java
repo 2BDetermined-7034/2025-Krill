@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.*;
 
 import static edu.wpi.first.units.Units.*;
@@ -11,15 +10,11 @@ public class Constants {
 		public static final int INTAKE_MOTOR_ID = 16;
 		public static final int CANCODER_ID = 15;
 
-		public static final double CANCODER_OFFSET = 0.23974609375;
+		public static final double CANCODER_OFFSET = 0.324462890625;
 
 		public static final double GEAR_RATIO = 9.0;
 
 		public static final Current ARM_CURRENT_LIMIT = Amps.of(60.0);
-		public static final Current INTAKE_CURRENT_LIMIT = Amps.of(60.0);
-
-		public static final Angle MIN_POSITION = Rotations.of(-0.08);
-		public static final Angle MAX_POSITION = Rotations.of(0.17);
 	}
 
 	public static final class Elevator {
@@ -32,7 +27,6 @@ public class Constants {
 
 		public static final Current CURRENT_LIMIT = Amps.of(80.0);
 
-		public static final Distance SPOOL_RADIUS = Inches.of(3.82/2);
 	}
 
 	public static final class Climb {

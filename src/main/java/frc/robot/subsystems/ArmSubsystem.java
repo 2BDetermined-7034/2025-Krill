@@ -18,14 +18,15 @@ import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.Arm.*;
 
 public class ArmSubsystem extends SubsystemBase {
-	private TalonFX armMotor;
-	private TalonFX intakeMotor;
-	private CANcoder canCoder;
+	private final TalonFX armMotor;
+	private final TalonFX intakeMotor;
+	private final CANcoder canCoder;
 
 
 	public enum ScoringPosition {
-		Outtake(Rotations.of(-0.068)),
-		IntakeCoralStation(Rotations.of(0.1));
+		Outtake(Degrees.of(-20.0)),
+		OuttakeFlick(Degrees.of(0)),
+		IntakeCoralStation(Degrees.of(40));
 		private final Angle armAngle;
 
 		ScoringPosition(Angle armAngle) {
@@ -50,11 +51,11 @@ public class ArmSubsystem extends SubsystemBase {
 		slotConfigs.GravityType = GravityTypeValue.Arm_Cosine;
 		slotConfigs.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 		slotConfigs.kA = 0.01;
-		slotConfigs.kG = 0.42;
+		slotConfigs.kG = 0.40;
 		slotConfigs.kV = 0.44;
 		slotConfigs.kS = 0.35;
-		slotConfigs.kP = 5;
-		slotConfigs.kI = 5;
+		slotConfigs.kP = 10;
+		slotConfigs.kI = 0;
 		slotConfigs.kD = 1;
 
 		var motionMagicConfigs = talonFXConfigs.MotionMagic;
@@ -63,7 +64,7 @@ public class ArmSubsystem extends SubsystemBase {
 		motionMagicConfigs.MotionMagicJerk = 0;
 
 		talonFXConfigs.Feedback.FeedbackRemoteSensorID = CANCODER_ID;
-		talonFXConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+		talonFXConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.SyncCANcoder;
 		talonFXConfigs.Feedback.RotorToSensorRatio = GEAR_RATIO;
 		talonFXConfigs.Feedback.SensorToMechanismRatio = 1.0;
 		talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -72,10 +73,10 @@ public class ArmSubsystem extends SubsystemBase {
 		armMotor.getConfigurator().apply(talonFXConfigs);
 
 
-		var ccConfig = new CANcoderConfiguration();
-		ccConfig.MagnetSensor.MagnetOffset = CANCODER_OFFSET;
-		ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-		canCoder.getConfigurator().apply(ccConfig);
+//		var ccConfig = new CANcoderConfiguration();
+////		ccConfig.MagnetSensor.MagnetOffset = CANCODER_OFFSET - /*Degrees.of(24.2).in(Rotations)*/;
+//		ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+//		canCoder.getConfigurator().apply(ccConfig);
 
 	}
 
@@ -98,7 +99,7 @@ public class ArmSubsystem extends SubsystemBase {
 
 	public Command setArmAngle(Angle position) {
 		return new FunctionalCommand(
-			() -> armMotor.setControl(new MotionMagicVoltage(clamp(position, MIN_POSITION, MAX_POSITION))),
+			() -> armMotor.setControl(new MotionMagicVoltage(position)),
 			() -> {},
 			(interrupted) -> {},
 			() -> true
