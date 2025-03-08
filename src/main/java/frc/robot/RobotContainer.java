@@ -55,6 +55,7 @@ public class RobotContainer {
 	public RobotContainer() {
 
 		NamedCommands.registerCommand("L4", ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L4));
+		NamedCommands.registerCommand("L4 Temp Auto", ArmElevatorFactory.scoreCoralTempAuto(drivetrain, elevator, arm, ElevatorPosition.L4));
 		NamedCommands.registerCommand("L2", ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L2));
 		NamedCommands.registerCommand("Elevator Ground", elevator.setElevatorPosition(ElevatorPosition.HOME));
 
