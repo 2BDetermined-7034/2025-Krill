@@ -102,6 +102,9 @@ public class Vision {
 		 */
 		Cameras(String name, Transform3d robotToCam, PhotonPoseEstimator.PoseStrategy poseStrategy, Vector<N3> singleTagStdDevs, Vector<N3> multiTagStdDevs) {
 			this.photonCamera = new PhotonCamera(name);
+			if (this.photonCamera.getDriverMode()) {
+				System.out.print("CAMERA " + name + " DISABLED");
+			}
 			this.robotToCam = robotToCam;
 			this.singleTagStdDevs = singleTagStdDevs;
 			this.multiTagStdDevs = multiTagStdDevs;
