@@ -26,4 +26,13 @@ public class ArmElevatorFactory {
 			new IntakeCommand(arm)
 		).andThen(Commands.print("intakeCoral Ended"));
 	}
+
+	public static Command scoreCoralTempAuto(CommandSwerveDrivetrain swerveDrivetrain, ElevatorSubsystem elevator, ArmSubsystem arm, ElevatorSubsystem.ElevatorPosition elevatorPosition) {
+		return new ParallelCommandGroup(
+			Commands.print("Command Starting"),
+			elevator.setElevatorPosition(elevatorPosition),
+			arm.setArmAngle(ArmSubsystem.ScoringPosition.OuttakeTempAuto)
+			//OTFPathFinding.goToNearestReef(swerveDrivetrain)
+		);
+	}
 }
