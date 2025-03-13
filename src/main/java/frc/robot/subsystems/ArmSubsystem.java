@@ -24,7 +24,8 @@ public class ArmSubsystem extends SubsystemBase {
 
 
 	public enum ScoringPosition {
-		Outtake(Degrees.of(-20.0)),
+		Outtake(Degrees.of(-20)),
+		OuttakeTempAuto(Degrees.of(-25)),
 		OuttakeFlick(Degrees.of(0)),
 		IntakeCoralStation(Degrees.of(40));
 		private final Angle armAngle;
@@ -63,18 +64,19 @@ public class ArmSubsystem extends SubsystemBase {
 		motionMagicConfigs.MotionMagicAcceleration = 3;
 		motionMagicConfigs.MotionMagicJerk = 0;
 
-		talonFXConfigs.Feedback.FeedbackRemoteSensorID = CANCODER_ID;
-		talonFXConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.SyncCANcoder;
-		talonFXConfigs.Feedback.RotorToSensorRatio = GEAR_RATIO;
-		talonFXConfigs.Feedback.SensorToMechanismRatio = 1.0;
+//		talonFXConfigs.Feedback.FeedbackRemoteSensorID = CANCODER_ID;
+		talonFXConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+		talonFXConfigs.Feedback.RotorToSensorRatio = 1;
+		talonFXConfigs.Feedback.SensorToMechanismRatio = GEAR_RATIO;
 		talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 		talonFXConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 		talonFXConfigs.CurrentLimits.SupplyCurrentLimit = ARM_CURRENT_LIMIT.in(Amps);
 		armMotor.getConfigurator().apply(talonFXConfigs);
 
+		armMotor.setPosition(Degrees.of(-24.2));
 
 //		var ccConfig = new CANcoderConfiguration();
-////		ccConfig.MagnetSensor.MagnetOffset = CANCODER_OFFSET - /*Degrees.of(24.2).in(Rotations)*/;
+//		ccConfig.MagnetSensor.MagnetOffset = CANCODER_OFFSET - Degrees.of(24.2).in(Rotations);
 //		ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
 //		canCoder.getConfigurator().apply(ccConfig);
 
@@ -126,5 +128,12 @@ public class ArmSubsystem extends SubsystemBase {
 			(interrupted) -> {},
 			() -> false
 		).withTimeout(Seconds.of(0.5));
+	}
+
+	public Command zero() {
+		return Commands.startEnd(
+			() -> armMotor.setControl(new CoastOut()),
+			() -> armMotor.setPosition(Degrees.of(-24.2))
+		);
 	}
 }
