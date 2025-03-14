@@ -127,4 +127,8 @@ public class ArmSubsystem extends SubsystemBase {
 			() -> false
 		).withTimeout(Seconds.of(0.5));
 	}
+
+	public Command zero() {
+		return Commands.runOnce(() -> armMotor.setPosition(0.0));
+	}
 }

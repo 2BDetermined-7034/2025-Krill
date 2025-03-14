@@ -60,7 +60,7 @@ public class Vision {
 		FRONT_CAM(
 			"front",
 			new Transform3d(
-				new Translation3d(Meters.of(0.355), Meters.of(0), Meters.of(0.18)),
+				new Translation3d(Meters.of(0.355), Meters.of(0), Meters.of(0.175)),
 				new Rotation3d(Degrees.of(0), Degrees.of(-9.0), Degrees.of(0))
 			),
 			PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
@@ -71,7 +71,7 @@ public class Vision {
 		BACK_CAM(
 			"back",
 				new Transform3d(
-				new Translation3d(Meters.of(-0.355), Meters.of(0), Meters.of(0.19)),
+				new Translation3d(Meters.of(-0.355), Meters.of(0), Meters.of(0.20)),
 				new Rotation3d(Degrees.of(0), Degrees.of(-25.0), Degrees.of(180.0))
 			),
 			PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
