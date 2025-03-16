@@ -102,7 +102,7 @@ public class RobotContainer {
 //		driverController.options().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 		driverController.square().whileTrue(OTFPathFinding.goToNearestReef(drivetrain));
 		driverController.triangle().whileTrue(OTFPathFinding.goToNearestCoralStation(drivetrain));
-		driverController.PS().onTrue(arm.zero());
+		driverController.PS().whileTrue(arm.zero());
 //
 //
 

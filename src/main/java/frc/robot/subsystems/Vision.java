@@ -61,11 +61,11 @@ public class Vision {
 			"front",
 			new Transform3d(
 				new Translation3d(Meters.of(0.355), Meters.of(0), Meters.of(0.175)),
-				new Rotation3d(Degrees.of(0), Degrees.of(-9.0), Degrees.of(0))
+				new Rotation3d(Degrees.of(0), Degrees.of(-9.3), Degrees.of(0))
 			),
 			PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
 			VecBuilder.fill(3, 3, 0.5),
-			VecBuilder.fill(1.5, 1.5, 0.5)
+			VecBuilder.fill(0.5, 0.5, 0.5)
 		),
 
 		BACK_CAM(

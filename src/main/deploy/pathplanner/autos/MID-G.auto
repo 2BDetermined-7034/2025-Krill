@@ -28,6 +28,12 @@
           "data": {
             "name": "1s Outtake"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Flick Outtake"
+          }
         }
       ]
     }

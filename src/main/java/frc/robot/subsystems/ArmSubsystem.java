@@ -64,9 +64,9 @@ public class ArmSubsystem extends SubsystemBase {
 		motionMagicConfigs.MotionMagicJerk = 0;
 
 		talonFXConfigs.Feedback.FeedbackRemoteSensorID = CANCODER_ID;
-		talonFXConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.SyncCANcoder;
-		talonFXConfigs.Feedback.RotorToSensorRatio = GEAR_RATIO;
-		talonFXConfigs.Feedback.SensorToMechanismRatio = 1.0;
+		talonFXConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+		talonFXConfigs.Feedback.RotorToSensorRatio = 1.0;
+		talonFXConfigs.Feedback.SensorToMechanismRatio = GEAR_RATIO;
 		talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 		talonFXConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 		talonFXConfigs.CurrentLimits.SupplyCurrentLimit = ARM_CURRENT_LIMIT.in(Amps);
@@ -129,6 +129,9 @@ public class ArmSubsystem extends SubsystemBase {
 	}
 
 	public Command zero() {
-		return Commands.runOnce(() -> armMotor.setPosition(0.0));
+		return Commands.startEnd(
+			() -> armMotor.setControl(new CoastOut()),
+			() -> armMotor.setPosition(HOME_POSITION)
+		);
 	}
 }

@@ -15,6 +15,7 @@ public class Constants {
 		public static final double GEAR_RATIO = 9.0;
 
 		public static final Current ARM_CURRENT_LIMIT = Amps.of(60.0);
+		public static final Angle HOME_POSITION = Degrees.of(-24.2);
 	}
 
 	public static final class Elevator {
