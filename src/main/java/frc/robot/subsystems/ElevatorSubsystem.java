@@ -4,12 +4,10 @@ import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -20,20 +18,17 @@ import static frc.robot.Constants.Elevator.*;
 public class ElevatorSubsystem extends SubsystemBase {
 	private final TalonFX masterMotor, slaveMotor;
 	private final CANcoder canCoder;
-	private Angle targetPosition;
 
-	public enum ElevatorPosition {
-		HOME(Rotations.of(0.02)),
+	public enum ScoringPosition {
+		HOME(Rotations.of(0)),
 		L1(Rotations.of(0.103027)),
-		INTAKE(Rotations.of(0.33)),
 		L2(Rotations.of(0.553223)),
 		L3(Rotations.of(1.222168)),
 		L4(Rotations.of(2.24));
-//		L4(Rotations.of(2.174));
 
 		private final Angle scoringPosition;
 
-		ElevatorPosition(Angle scoringPosition) {
+		ScoringPosition(Angle scoringPosition) {
 			this.scoringPosition = scoringPosition;
 		}
 
@@ -58,7 +53,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 		upConfig.GravityType = GravityTypeValue.Elevator_Static;
 		upConfig.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 		upConfig.kS = 0.38;
-		upConfig.kV = 0.5;
+		upConfig.kV = 0.45;
 		upConfig.kA = 0.0;
 		upConfig.kG = 0.45;
 		upConfig.kP = 3;
@@ -69,9 +64,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 		downConfig.GravityType = GravityTypeValue.Elevator_Static;
 		downConfig.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 		downConfig.kS = 0.38;
-		downConfig.kV = 0.35;
+		downConfig.kV = 0.3;
 		downConfig.kA = 0.0;
-		downConfig.kG = 0.7;
+		downConfig.kG = 0.65;
 		downConfig.kP = 5;
 		downConfig.kI = 0.0;
 		downConfig.kD = 1;
@@ -79,12 +74,12 @@ public class ElevatorSubsystem extends SubsystemBase {
 		Slot2Configs level4Config = talonFXConfigs.Slot2;
 		level4Config.GravityType = GravityTypeValue.Elevator_Static;
 		level4Config.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
-		level4Config.kS = 0.55;
+		level4Config.kS = 0.5;
 		level4Config.kV = 0.45;
 		level4Config.kA = 0.0;
-		level4Config.kG = 0.7;
+		level4Config.kG = 0.45;
 		level4Config.kP = 3;
-		level4Config.kI = 0.8;
+		level4Config.kI = 0.7;
 		level4Config.kD = 0.5;
 
 
@@ -110,12 +105,11 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 		var ccConfig = new CANcoderConfiguration();
 		ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-		ccConfig.MagnetSensor.MagnetOffset = -0.296142578125;
+		ccConfig.MagnetSensor.MagnetOffset = -0.1845703125;
 		canCoder.getConfigurator().apply(ccConfig);
 
 		new Trigger(DriverStation::isEnabled).onTrue(Commands.runOnce(() -> masterMotor.setControl(new CoastOut())));
 
-		targetPosition = ElevatorPosition.HOME.getAngle();
 	}
 
 	@Override
@@ -129,54 +123,54 @@ public class ElevatorSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Command to change the elevator position through MotionMagic
 	 * @param angle angle setpoint of the elevator
 	 * @return the command
 	 */
 	public Command setElevatorPosition(Angle angle) {
-		return new FunctionalCommand(
-			() -> {
-				if (angle.equals(ElevatorPosition.L4.getAngle())) {
-					masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(2));
-				} else if (angle.lt(getElevatorAngle())) {
-					masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(1));
-				} else {
-					masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(0));
-				}
-			},
-			() -> {},
-			(interrupted) -> {},
-			() -> true
-		);
-	}
 
-	/**
-	 * Command to change the elevator position through MotionMagic
-	 * @param elevatorPosition the enum position
-	 * @return the command to set the elevator to the position
-	 */
-	public Command setElevatorPosition(ElevatorPosition elevatorPosition) {
-		return setElevatorPosition(elevatorPosition.getAngle());
-	}
-
-	/**
-	 * Command to manually set the elevator motor voltage
-	 * @param volts voltage to set the elevator to
-	 * @return the command
-	 */
-	public Command setElevatorVoltage(Voltage volts) {
 		return new FunctionalCommand(
-				() -> masterMotor.setControl(new VoltageOut(volts)),
-				() -> {},
+				() -> {
+					if (angle.equals(ScoringPosition.L4.getAngle())) {
+						masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(2));
+					} else if (angle.lt(getElevatorAngle())) {
+						masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(1));
+					} else {
+						masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(0));
+					}
+				},
+				() -> {
+				},
 				(interrupted) -> {
-					masterMotor.setControl(new MotionMagicVoltage(masterMotor.getPosition().getValue()).withSlot(1));
 				},
 				() -> false
 		);
 	}
 
-	public boolean isAtSetpoint() {
-//		return getElevatorAngle().isNear(targetPosition, Rotations.of(0.1));
-		return true;
+	public Command setElevatorPosition(ScoringPosition scoringPosition) {
+		return setElevatorPosition(scoringPosition.getAngle());
+	}
+
+	public Command setELevatorPosition(ScoringPosition scoringPosition, Angle angle, Angle tolerance) {
+		return new FunctionalCommand(
+				() -> {
+					if (angle.equals(ScoringPosition.L4.getAngle())) {
+						masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(2));
+					} else if (angle.lt(getElevatorAngle())) {
+						masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(1));
+					} else {
+						masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(0));
+					}
+				},
+				() -> {
+				},
+				(interrupted) -> {
+				},
+				() -> {
+					if (masterMotor.getPosition().getValue().isNear(scoringPosition.getAngle(), tolerance)) {
+						return true;
+					}
+					return false;
+				}
+		);
 	}
 }
