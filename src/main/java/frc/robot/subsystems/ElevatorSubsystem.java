@@ -123,25 +123,26 @@ public class ElevatorSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 *
 	 * @param angle angle setpoint of the elevator
 	 * @return the command
 	 */
 	public Command setElevatorPosition(Angle angle) {
 
 		return new FunctionalCommand(
-			() -> {
-				if (angle.equals(ScoringPosition.L4.getAngle())) {
-					masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(2));
-				} else if (angle.lt(getElevatorAngle())) {
-					masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(1));
-				} else {
-					masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(0));
-				}
-			},
-			() -> {},
-			(interrupted) -> {},
-			() -> false
+				() -> {
+					if (angle.equals(ScoringPosition.L4.getAngle())) {
+						masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(2));
+					} else if (angle.lt(getElevatorAngle())) {
+						masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(1));
+					} else {
+						masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(0));
+					}
+				},
+				() -> {
+				},
+				(interrupted) -> {
+				},
+				() -> false
 		);
 	}
 
@@ -149,4 +150,27 @@ public class ElevatorSubsystem extends SubsystemBase {
 		return setElevatorPosition(scoringPosition.getAngle());
 	}
 
+	public Command setELevatorPosition(ScoringPosition scoringPosition, Angle angle, Angle tolerance) {
+		return new FunctionalCommand(
+				() -> {
+					if (angle.equals(ScoringPosition.L4.getAngle())) {
+						masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(2));
+					} else if (angle.lt(getElevatorAngle())) {
+						masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(1));
+					} else {
+						masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(0));
+					}
+				},
+				() -> {
+				},
+				(interrupted) -> {
+				},
+				() -> {
+					if (masterMotor.getPosition().getValue().isNear(scoringPosition.getAngle(), tolerance)) {
+						return true;
+					}
+					return false;
+				}
+		);
+	}
 }
