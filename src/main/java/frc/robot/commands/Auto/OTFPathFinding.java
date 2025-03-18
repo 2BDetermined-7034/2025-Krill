@@ -61,16 +61,16 @@ public class OTFPathFinding {
 
 	private static final Pose2d RC_BLUE = new Pose2d(
 		Meters.of(1.114217758178711), Meters.of(0.9747062921524048),
-		new Rotation2d(Degrees.of(233.5)));
+		new Rotation2d(Degrees.of(234)));
 	private static final Pose2d LC_BLUE = new Pose2d(
 		Meters.of(1.1308588981628418), Meters.of(7.066422462463379),
-		new Rotation2d(Degrees.of(-233.5)));
+		new Rotation2d(Degrees.of(-234)));
 	private static final Pose2d LC_RED = new Pose2d(
 		Meters.of(16.4544677734375), Meters.of(0.9897422194480896),
-		new Rotation2d(Degrees.of(-53.5)));
+		new Rotation2d(Degrees.of(-54)));
 	private static final Pose2d RC_RED = new Pose2d(
 		Meters.of(16.41495132446289), Meters.of(7.076528072357178),
-		new Rotation2d(Degrees.of(53.5)));
+		new Rotation2d(Degrees.of(54)));
 
 	// public static Command goToPose(SwerveSubsystem swerve, int scoreLocation) {
 	// 	Alliance alliance = DriverStation.getAlliance().get();
@@ -100,8 +100,8 @@ public class OTFPathFinding {
 
 		Translation2d reef = isBlue ? blueReef : redReef;
 
-		Distance distFromReef = Inches.of(32.75 + 14);
-		Distance distTangent = Inches.of(7);
+		Distance distFromReef = Meters.of(0.872175 / 2.0).plus(Inches.of(32.74));
+		Distance distTangent = Inches.of(6); // 12.93775566 / 2
 
 		Angle angleToReef = Rotations.of(drivebase.getPose().getTranslation().minus(reef).getAngle().getRotations());
 		Angle clampedAngle = Rotations.of(Math.round(angleToReef.in(Rotations) * 6.0) / 6.0);

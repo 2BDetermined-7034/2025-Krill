@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.commands.Auto.OTFPathFinding;
+import frc.robot.commands.Auto.PointAtCoralStation;
+import frc.robot.commands.Auto.PointAtReef;
 import frc.robot.commands.Intake.IntakeCommand;
 import frc.robot.commands.Intake.OuttakeCommand;
 import frc.robot.commands.Reef.ArmElevatorFactory;
@@ -59,6 +61,7 @@ public class RobotContainer {
 
 		NamedCommands.registerCommand("Outtake", new OuttakeCommand(arm));
 		NamedCommands.registerCommand("1s Outtake", new OuttakeCommand(arm).withTimeout(Seconds.of(0.8)));
+		NamedCommands.registerCommand("0.5s Outtake", new OuttakeCommand(arm).withTimeout(Seconds.of(0.5)));
 		NamedCommands.registerCommand("intakeCoral", ArmElevatorFactory.intakeCoral(elevator, arm).andThen(new WaitCommand(0.2)));
 		NamedCommands.registerCommand("Spin Intake", arm.spinIntakeCommand());
 		NamedCommands.registerCommand("Flick Outtake", arm.setArmAngle(ArmSubsystem.ScoringPosition.OuttakeFlick).withTimeout(0.4));
@@ -93,11 +96,20 @@ public class RobotContainer {
 					.withVelocityY(driverController.getLeftX() * MaxSpeed * -0.75) // Drive left with negative X (left)
 					.withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
 			)
-
-
 		);
 
-
+		driverController.L2().whileTrue(PointAtReef.pointAtReef(
+			() -> driverController.getLeftY() * MaxSpeed * -0.75,
+			() -> driverController.getLeftX() * MaxSpeed * -0.75,
+			MaxSpeed * 0.1,
+			drivetrain
+		));
+		driverController.R2().whileTrue(PointAtCoralStation.pointAtCoralStation(
+			() -> driverController.getLeftY() * MaxSpeed * -0.75,
+			() -> driverController.getLeftX() * MaxSpeed * -0.75,
+			MaxSpeed * 0.1,
+			drivetrain
+		));
 
 //		driverController.options().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 		driverController.square().whileTrue(OTFPathFinding.goToNearestReef(drivetrain));
@@ -110,7 +122,7 @@ public class RobotContainer {
 		for (int i = 0; i < 360; i += 45) {
 			final double angle = (i / -180.0f) * Math.PI;
 			driverController.pov(i).whileTrue(drivetrain.applyRequest(() ->
-				driveCentric.withVelocityX(Math.cos(angle) * 0.8 + 0.2).withVelocityY(Math.sin(angle) * 1.0)
+				driveCentric.withVelocityX(Math.cos(angle) * 0.4 + 0.1).withVelocityY(Math.sin(angle) * 0.5)
 			));
 		}
 

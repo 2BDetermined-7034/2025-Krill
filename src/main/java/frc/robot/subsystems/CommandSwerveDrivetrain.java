@@ -345,7 +345,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Command driveToPose(Pose2d pose) {
         // Create the constraints to use while pathfinding
         PathConstraints constraints = new PathConstraints(
-                TunerConstants.kSpeedAt12Volts, MetersPerSecondPerSecond.of(3),
+                TunerConstants.kSpeedAt12Volts, MetersPerSecondPerSecond.of(2.3),
                 DegreesPerSecond.of(540), DegreesPerSecondPerSecond.of(720));
 
         // Since AutoBuilder is configured, we can use it to build pathfinding commands
