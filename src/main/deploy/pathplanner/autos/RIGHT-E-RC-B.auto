@@ -17,7 +17,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "MID-G"
+                  "pathName": "RIGHT-E"
                 }
               }
             ]
@@ -30,19 +30,31 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Flick Outtake"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Elevator Ground"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "named",
-                "data": {
-                  "name": "intakeCoral"
-                }
-              },
-              {
                 "type": "path",
                 "data": {
-                  "pathName": "G-RC"
+                  "pathName": "E-RC"
                 }
               }
             ]
@@ -51,7 +63,7 @@
         {
           "type": "named",
           "data": {
-            "name": "1s Drive Forward"
+            "name": "intakeCoral"
           }
         },
         {
@@ -69,12 +81,6 @@
                 "data": {
                   "pathName": "RC-B "
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Spin Intake"
-                }
               }
             ]
           }
@@ -83,6 +89,12 @@
           "type": "named",
           "data": {
             "name": "1s Outtake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Flick Outtake"
           }
         }
       ]

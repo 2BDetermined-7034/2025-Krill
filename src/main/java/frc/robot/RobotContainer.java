@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import frc.robot.commands.Auto.DriveForward;
 import frc.robot.commands.Auto.OTFPathFinding;
 import frc.robot.commands.Auto.PointAtReef;
 import frc.robot.commands.Auto.PointAtCoralStation;
@@ -60,6 +61,7 @@ public class RobotContainer {
 	public RobotContainer() {
 
 		NamedCommands.registerCommand("L4", ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L4));
+		NamedCommands.registerCommand("L4 Temp Auto", ArmElevatorFactory.scoreCoralTempAuto(drivetrain, elevator, arm, ElevatorPosition.L4));
 		NamedCommands.registerCommand("L2", ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L2));
 		NamedCommands.registerCommand("Elevator Ground", elevator.setElevatorPosition(ElevatorPosition.HOME));
 
@@ -68,6 +70,7 @@ public class RobotContainer {
 		NamedCommands.registerCommand("intakeCoral", ArmElevatorFactory.intakeCoral(elevator, arm).andThen(new WaitCommand(0.2)));
 		NamedCommands.registerCommand("Spin Intake", arm.spinIntakeCommand());
 		NamedCommands.registerCommand("Flick Outtake", arm.setArmAngle(ArmSubsystem.ScoringPosition.OuttakeFlick).withTimeout(0.4));
+		NamedCommands.registerCommand("1s Drive Forward", DriveForward.driveForward(drivetrain));
 
 		boolean isCompetition = false;
 
@@ -122,6 +125,7 @@ public class RobotContainer {
 //		driverController.options().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 		driverController.square().whileTrue(OTFPathFinding.goToNearestReef(drivetrain));
 		driverController.triangle().whileTrue(OTFPathFinding.goToNearestCoralStation(drivetrain));
+		driverController.PS().whileTrue(arm.zero());
 
 
 		for (int i = 0; i < 360; i += 45) {
@@ -150,6 +154,7 @@ public class RobotContainer {
 		operatorController.cross().onTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L2));
 //
 //
+
 		drivetrain.registerTelemetry(logger::telemeterize);
 
 	}
