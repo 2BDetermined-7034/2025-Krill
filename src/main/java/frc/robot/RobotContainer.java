@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.commands.Auto.DriveForward;
 import frc.robot.commands.Auto.OTFPathFinding;
+import frc.robot.commands.Auto.PointAtReef;
+import frc.robot.commands.Auto.PointAtCoralStation;
 import frc.robot.commands.Intake.IntakeCommand;
 import frc.robot.commands.Intake.OuttakeCommand;
 import frc.robot.commands.Reef.ArmElevatorFactory;
@@ -30,12 +32,14 @@ import static edu.wpi.first.units.Units.*;
 
 
 public class RobotContainer {
+	private final double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+	private final double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+
 	public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 	public final ArmSubsystem arm = new ArmSubsystem();
 	public final ElevatorSubsystem elevator = new ElevatorSubsystem();
 	public final ClimbSubsystem climb = new ClimbSubsystem();
-	private final double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-	private final double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+
 	/* Setting up bindings for necessary control of the swerve drive platform */
 	private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
 		.withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -43,9 +47,11 @@ public class RobotContainer {
 	private final SwerveRequest.RobotCentric driveCentric = new SwerveRequest.RobotCentric()
 		.withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
 		.withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+
 	private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 	private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 	private final Telemetry logger = new Telemetry(MaxSpeed);
+
 	//private final CommandXboxController joystick = new CommandXboxController(0);
 	private final CommandPS5Controller driverController = new CommandPS5Controller(0);
 	private final CommandPS5Controller operatorController = new CommandPS5Controller(1);
@@ -96,18 +102,30 @@ public class RobotContainer {
 					.withVelocityY(driverController.getLeftX() * MaxSpeed * -0.75) // Drive left with negative X (left)
 					.withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
 			)
-
-
 		);
 
+		driverController.R2().whileTrue(
+			PointAtReef.pointAtReef(
+				() -> driverController.getLeftY() * MaxSpeed * -0.75,
+				() -> driverController.getLeftX() * MaxSpeed * -0.75,
+				MaxSpeed * 0.1,
+				drivetrain
+			)
+		);
 
+		driverController.L2().whileTrue(
+			PointAtCoralStation.pointAtCoralStation(
+				() -> driverController.getLeftY() * MaxSpeed * -0.75,
+				() -> driverController.getLeftX() * MaxSpeed * -0.75,
+				MaxSpeed * 0.1,
+				drivetrain
+			)
+		);
 
 //		driverController.options().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 		driverController.square().whileTrue(OTFPathFinding.goToNearestReef(drivetrain));
 		driverController.triangle().whileTrue(OTFPathFinding.goToNearestCoralStation(drivetrain));
 		driverController.PS().whileTrue(arm.zero());
-//
-//
 
 
 		for (int i = 0; i < 360; i += 45) {
