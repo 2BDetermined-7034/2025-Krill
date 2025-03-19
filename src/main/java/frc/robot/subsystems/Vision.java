@@ -72,7 +72,7 @@ public class Vision {
 			"back",
 				new Transform3d(
 				new Translation3d(Meters.of(-0.355), Meters.of(0), Meters.of(0.20)),
-				new Rotation3d(Degrees.of(0), Degrees.of(-25.0), Degrees.of(180.0))
+				new Rotation3d(Degrees.of(0), Degrees.of(-18.2), Degrees.of(180.0))
 			),
 			PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
 			VecBuilder.fill(4.0, 4.0, 1.0),

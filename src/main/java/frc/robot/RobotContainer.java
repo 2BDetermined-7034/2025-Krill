@@ -9,6 +9,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,10 +22,7 @@ import frc.robot.commands.Intake.IntakeCommand;
 import frc.robot.commands.Intake.OuttakeCommand;
 import frc.robot.commands.Reef.ArmElevatorFactory;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.ClimbSubsystem;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.*;
 import frc.robot.subsystems.ElevatorSubsystem.ElevatorPosition;
 
 import static edu.wpi.first.units.Units.*;
@@ -50,10 +48,13 @@ public class RobotContainer {
 	//private final CommandXboxController joystick = new CommandXboxController(0);
 	private final CommandPS5Controller driverController = new CommandPS5Controller(0);
 	private final CommandPS5Controller operatorController = new CommandPS5Controller(1);
+	private final LED led = new LED();
 
 	private final SendableChooser<Command> autoChooser;
 
 	public RobotContainer() {
+
+		led.runPattern(LEDPattern.progressMaskLayer(() -> elevator.getElevatorAngle().in(Rotations) / 2.5), LEDPattern.progressMaskLayer(() -> elevator.getElevatorAngle().in(Rotations) / 2.5));
 
 		NamedCommands.registerCommand("L4", ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L4));
 		NamedCommands.registerCommand("L2", ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L2));
