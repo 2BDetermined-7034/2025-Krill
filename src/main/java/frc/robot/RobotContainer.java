@@ -64,7 +64,7 @@ public class RobotContainer {
 		NamedCommands.registerCommand("0.5s Outtake", new OuttakeCommand(arm).withTimeout(Seconds.of(0.5)));
 		NamedCommands.registerCommand("intakeCoral", ArmElevatorFactory.intakeCoral(elevator, arm).andThen(new WaitCommand(0.2)));
 		NamedCommands.registerCommand("Spin Intake", arm.spinIntakeCommand());
-		NamedCommands.registerCommand("Flick Outtake", arm.setArmAngle(ArmSubsystem.ScoringPosition.OuttakeFlick).withTimeout(0.4));
+		NamedCommands.registerCommand("Flick Outtake", arm.setArmAngle(ArmSubsystem.ScoringPosition.OuttakeFlick).andThen(new WaitCommand(0.5)));
 
 		boolean isCompetition = false;
 
@@ -98,13 +98,13 @@ public class RobotContainer {
 			)
 		);
 
-		driverController.L2().whileTrue(PointAtReef.pointAtReef(
+		driverController.L1().whileTrue(PointAtReef.pointAtReef(
 			() -> driverController.getLeftY() * MaxSpeed * -0.75,
 			() -> driverController.getLeftX() * MaxSpeed * -0.75,
 			MaxSpeed * 0.1,
 			drivetrain
 		));
-		driverController.R2().whileTrue(PointAtCoralStation.pointAtCoralStation(
+		driverController.R1().whileTrue(PointAtCoralStation.pointAtCoralStation(
 			() -> driverController.getLeftY() * MaxSpeed * -0.75,
 			() -> driverController.getLeftX() * MaxSpeed * -0.75,
 			MaxSpeed * 0.1,
@@ -119,12 +119,18 @@ public class RobotContainer {
 //
 
 
-		for (int i = 0; i < 360; i += 45) {
-			final double angle = (i / -180.0f) * Math.PI;
-			driverController.pov(i).whileTrue(drivetrain.applyRequest(() ->
-				driveCentric.withVelocityX(Math.cos(angle) * 0.4 + 0.1).withVelocityY(Math.sin(angle) * 0.5)
-			));
-		}
+//		for (int i = 0; i < 360; i += 45) {
+//			final double angle = (i / -180.0f) * Math.PI;
+//			driverController.pov(i).whileTrue(drivetrain.applyRequest(() ->
+//				driveCentric.withVelocityX(Math.cos(angle) * 0.4 + 0.1).withVelocityY(Math.sin(angle) * 0.5)
+//			));
+//		}
+
+		driverController.povUp().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(0.5).withVelocityY(0)));
+		driverController.povDown().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(-0.5).withVelocityY(0)));
+		driverController.povLeft().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(0.1).withVelocityY(0.5)));
+		driverController.povRight().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(0.1).withVelocityY(-0.5)));
+
 
 		operatorController.povUp().whileTrue(elevator.setElevatorVoltage(Volts.of(2.0)));
 		operatorController.povLeft().whileTrue(ArmElevatorFactory.intakeCoral(elevator, arm));
