@@ -58,10 +58,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 		upConfig.GravityType = GravityTypeValue.Elevator_Static;
 		upConfig.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 		upConfig.kS = 0.38;
-		upConfig.kV = 0.5;
+		upConfig.kV = 0.55;
 		upConfig.kA = 0.0;
-		upConfig.kG = 0.45;
-		upConfig.kP = 3;
+		upConfig.kG = 0.55;
+		upConfig.kP = 4;
 		upConfig.kI = 0.7;
 		upConfig.kD = 0.5;
 
@@ -71,7 +71,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 		downConfig.kS = 0.38;
 		downConfig.kV = 0.35;
 		downConfig.kA = 0.0;
-		downConfig.kG = 0.7;
+		downConfig.kG = 0.6;
 		downConfig.kP = 5;
 		downConfig.kI = 0.0;
 		downConfig.kD = 1;
@@ -160,6 +160,19 @@ public class ElevatorSubsystem extends SubsystemBase {
 	}
 
 	/**
+	 * sets elevator position and then waits until it is at the setpoint and then stops.
+	 * @param elevatorPosition
+	 */
+	public Command setElevatorPositionSetpoint(Angle elevatorPosition) {
+		return setElevatorPosition(elevatorPosition).andThen(Commands.waitUntil(this::isAtSetpoint));
+	}
+
+	public Command setElevatorPositionSetpoint(ElevatorPosition elevatorPosition) {
+		return setElevatorPositionSetpoint(elevatorPosition.getAngle());
+
+	}
+
+	/**
 	 * Command to manually set the elevator motor voltage
 	 * @param volts voltage to set the elevator to
 	 * @return the command
@@ -176,7 +189,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 	}
 
 	public boolean isAtSetpoint() {
-//		return getElevatorAngle().isNear(targetPosition, Rotations.of(0.1));
-		return true;
+		return getElevatorAngle().isNear(targetPosition, Rotations.of(0.04));
 	}
 }

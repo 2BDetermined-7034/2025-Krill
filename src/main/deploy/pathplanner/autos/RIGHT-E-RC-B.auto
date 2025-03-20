@@ -5,19 +5,19 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "sequential",
           "data": {
             "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "L4"
-                }
-              },
               {
                 "type": "path",
                 "data": {
                   "pathName": "RIGHT-E"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L4 Elevator Setpoint"
                 }
               }
             ]
@@ -61,15 +61,15 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "L4"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "RC-B "
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L4 Elevator Setpoint"
           }
         },
         {

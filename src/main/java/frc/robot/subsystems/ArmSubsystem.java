@@ -78,6 +78,8 @@ public class ArmSubsystem extends SubsystemBase {
 //		ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
 //		canCoder.getConfigurator().apply(ccConfig);
 
+		armMotor.setPosition(HOME_POSITION);
+
 	}
 
 	public Angle getPosition() {

@@ -54,18 +54,7 @@ public class RobotContainer {
 	private final SendableChooser<Command> autoChooser;
 
 	public RobotContainer() {
-
-		NamedCommands.registerCommand("L4", ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L4));
-		NamedCommands.registerCommand("L2", ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L2));
-		NamedCommands.registerCommand("Elevator Ground", elevator.setElevatorPosition(ElevatorPosition.HOME));
-
-		NamedCommands.registerCommand("Outtake", new OuttakeCommand(arm));
-		NamedCommands.registerCommand("1s Outtake", new OuttakeCommand(arm).withTimeout(Seconds.of(0.8)));
-		NamedCommands.registerCommand("0.5s Outtake", new OuttakeCommand(arm).withTimeout(Seconds.of(0.5)));
-		NamedCommands.registerCommand("intakeCoral", ArmElevatorFactory.intakeCoral(elevator, arm).andThen(new WaitCommand(0.2)));
-		NamedCommands.registerCommand("Spin Intake", arm.spinIntakeCommand());
-		NamedCommands.registerCommand("Flick Outtake", arm.setArmAngle(ArmSubsystem.ScoringPosition.OuttakeFlick).andThen(new WaitCommand(0.5)));
-
+		namedCommands();
 		boolean isCompetition = false;
 
 		// Build an auto chooser. This will use Commands.none() as the default option.
@@ -82,6 +71,24 @@ public class RobotContainer {
 		SmartDashboard.putData("Auto Chooser", autoChooser);
 
 		configureBindings();
+
+
+	}
+
+	private void namedCommands() {
+
+		NamedCommands.registerCommand("L4", ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L4));
+		NamedCommands.registerCommand("L4 Elevator Setpoint", ArmElevatorFactory.scoreCoralElevatorSetpoint(elevator, arm, ElevatorPosition.L4).andThen(new WaitCommand(.05)));
+
+		NamedCommands.registerCommand("L2", ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L2));
+		NamedCommands.registerCommand("Elevator Ground", elevator.setElevatorPosition(ElevatorPosition.INTAKE).andThen(arm.setArmAngle(ArmSubsystem.ScoringPosition.IntakeCoralStation)));
+
+		NamedCommands.registerCommand("Outtake", new OuttakeCommand(arm));
+		NamedCommands.registerCommand("1s Outtake", new OuttakeCommand(arm).withTimeout(Seconds.of(0.8)));
+		NamedCommands.registerCommand("0.5s Outtake", new OuttakeCommand(arm).withTimeout(Seconds.of(0.5)));
+		NamedCommands.registerCommand("intakeCoral", ArmElevatorFactory.intakeCoral(elevator, arm).andThen(new WaitCommand(0.2)));
+		NamedCommands.registerCommand("Spin Intake", arm.spinIntakeCommand());
+		NamedCommands.registerCommand("Flick Outtake", arm.setArmAngle(ArmSubsystem.ScoringPosition.OuttakeFlick).andThen(new WaitCommand(0.5)));
 
 
 	}
@@ -144,15 +151,13 @@ public class RobotContainer {
 		operatorController.L1().whileTrue(new OuttakeCommand(arm));
 
 
-		operatorController.options().onTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L1));
-		operatorController.triangle().onTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L4));
-		operatorController.square().onTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L3));
+		operatorController.options().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L1));
+		operatorController.triangle().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L4));
+		operatorController.square().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L3));
 		operatorController.circle().onTrue(elevator.setElevatorPosition(ElevatorPosition.HOME));
-		operatorController.cross().onTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L2));
-//
-//
-		drivetrain.registerTelemetry(logger::telemeterize);
+		operatorController.cross().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L2));
 
+		drivetrain.registerTelemetry(logger::telemeterize);
 	}
 
 	public Command getAutonomousCommand() {
