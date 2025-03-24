@@ -9,15 +9,15 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "RIGHT-E"
+                  "name": "L4"
                 }
               },
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "L4 Elevator Setpoint"
+                  "pathName": "RIGHT-E"
                 }
               }
             ]
@@ -61,15 +61,15 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "RC-B "
+            "name": "L4"
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "L4 Elevator Setpoint"
+            "pathName": "RC-B "
           }
         },
         {

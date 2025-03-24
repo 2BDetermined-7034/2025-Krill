@@ -42,12 +42,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Elevator Ground"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -56,14 +50,14 @@
                 "data": {
                   "pathName": "J-LC"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeCoral"
+                }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "intakeCoral"
           }
         },
         {
