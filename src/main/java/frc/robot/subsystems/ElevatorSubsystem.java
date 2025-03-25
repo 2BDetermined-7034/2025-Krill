@@ -29,7 +29,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 		L2(Rotations.of(0.553223)),
 		L3(Rotations.of(1.222168)),
 		L4(Rotations.of(2.22));
-//		L4(Rotations.of(2.174));
 
 		private final Angle scoringPosition;
 
@@ -152,9 +151,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Command to change the elevator position through MotionMagic
-	 * @param elevatorPosition the enum position
-	 * @return the command to set the elevator to the position
+	 * {@link ElevatorSubsystem#setElevatorPosition(Angle)}
+	 * @param elevatorPosition the angle setpoint of the elevator
+	 * @return
 	 */
 	public Command setElevatorPosition(ElevatorPosition elevatorPosition) {
 		return setElevatorPosition(elevatorPosition.getAngle());
@@ -175,6 +174,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 	/**
 	 * Command to manually set the elevator motor voltage
+	 * after the command ends, switches to position control to hold its final position
 	 * @param volts voltage to set the elevator to
 	 * @return the command
 	 */
@@ -189,6 +189,11 @@ public class ElevatorSubsystem extends SubsystemBase {
 		);
 	}
 
+	/**
+	 * returns true when the elevator position is within position and velocity tolerance of a given setpoint
+	 * @param setpoint the setpoint to compare to
+	 * @return whether the elevator is within tolerance
+	 */
 	public boolean isAtSetpoint(Angle setpoint) {
 		return getElevatorAngle().isNear(setpoint, Rotations.of(0.1)) && getElevatorVelocity().lt(RotationsPerSecond.of(0.01));
 	}
