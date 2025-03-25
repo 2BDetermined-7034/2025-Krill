@@ -9,11 +9,15 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.Auto.OTFPathFinding;
 import frc.robot.commands.Auto.PointAtCoralStation;
 import frc.robot.commands.Auto.PointAtReef;
@@ -28,6 +32,7 @@ import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem.ElevatorPosition;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.subsystems.CommandSwerveDrivetrain.swap;
 
 
 public class RobotContainer {
@@ -72,8 +77,8 @@ public class RobotContainer {
 
 		configureBindings();
 
-
-	}
+		new Trigger((()->drivetrain.isNearCoralStation(50))).whileTrue(Commands.print("drivetrain is near the coral station"));
+}
 
 	private void namedCommands() {
 
@@ -91,7 +96,6 @@ public class RobotContainer {
 		NamedCommands.registerCommand("intakeCoral", ArmElevatorFactory.intakeCoral(elevator, arm).andThen(new WaitCommand(0.2)));
 		NamedCommands.registerCommand("Spin Intake", arm.spinIntakeCommand());
 		NamedCommands.registerCommand("Flick Outtake", arm.setArmAngle(ArmSubsystem.ScoringPosition.OuttakeFlick).andThen(new WaitCommand(0.5)));
-
 
 	}
 
@@ -125,7 +129,7 @@ public class RobotContainer {
 		driverController.triangle().whileTrue(OTFPathFinding.goToNearestCoralStation(drivetrain));
 		driverController.PS().whileTrue(arm.zero());
 //
-//
+
 
 
 //		for (int i = 0; i < 360; i += 45) {

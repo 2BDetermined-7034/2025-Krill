@@ -13,15 +13,20 @@ import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
+
+import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -32,8 +37,10 @@ import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.subsystems.vision.VisionPoseMeasurement;
 
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
+import static edu.wpi.first.math.MathUtil.isNear;
 import static edu.wpi.first.units.Units.*;
 
 /**
@@ -230,9 +237,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
 
-
+    public static boolean swap = false;
     @Override
     public void periodic() {
+        swap = !swap;
         var measurements = vision.getVisionPoseMeasurements();
         for (VisionPoseMeasurement poseMeasurement : measurements) {
             addVisionMeasurement(poseMeasurement);
@@ -378,5 +386,21 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public Pose2d getPose() {
         return super.getState().Pose;
+    }
+
+    /**
+     *
+     * @param tolerance some tolerance in inches
+     * @return if the robot's current position is within a circle of radius tolerance extending from either coral station april tag of the alliance
+     */
+    public boolean isNearCoralStation(double tolerance){
+        if (RobotBase.isSimulation()){
+            return isNear(this.getPose().getMeasureX().in(Units.Inches), DriverStationSim.getAllianceStationId().equals(AllianceStationID.Blue1) || DriverStationSim.getAllianceStationId().equals(AllianceStationID.Blue2) || DriverStationSim.getAllianceStationId().equals(AllianceStationID.Blue3)  ? 33.51 : 657.37, tolerance)
+                    && (isNear(this.getPose().getMeasureY().in(Units.Inches), 291.2, tolerance)
+                    || isNear(this.getPose().getMeasureY().in(Units.Inches), 25.8, tolerance));
+        }
+        return isNear(this.getPose().getMeasureX().in(Units.Inches), DriverStation.getAlliance().get().equals(Alliance.Blue)  ? 33.51 : 657.37, tolerance)
+                && (isNear(this.getPose().getMeasureY().in(Units.Inches), 291.2, tolerance)
+                || isNear(this.getPose().getMeasureY().in(Units.Inches), 25.8, tolerance));
     }
 }
