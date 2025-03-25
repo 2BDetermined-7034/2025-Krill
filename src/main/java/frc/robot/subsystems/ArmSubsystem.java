@@ -64,7 +64,7 @@ public class ArmSubsystem extends SubsystemBase {
 		motionMagicConfigs.MotionMagicJerk = 0;
 
 		talonFXConfigs.Feedback.FeedbackRemoteSensorID = CANCODER_ID;
-		talonFXConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.SyncCANcoder;
+		talonFXConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
 		talonFXConfigs.Feedback.RotorToSensorRatio = GEAR_RATIO;
 		talonFXConfigs.Feedback.SensorToMechanismRatio = 1;
 		talonFXConfigs.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
