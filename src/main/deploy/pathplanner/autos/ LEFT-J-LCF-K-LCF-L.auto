@@ -5,22 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "sequential",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "LEFT-J"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "L4 Elevator Setpoint"
-                }
-              }
-            ]
+            "pathName": "LEFT-J"
           }
         },
         {
@@ -30,19 +17,32 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "deadline",
           "data": {
             "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "J-LCF"
-                }
-              },
               {
                 "type": "named",
                 "data": {
                   "name": "intakeCoral"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "J-LCF"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Ram"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -74,19 +74,32 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "deadline",
           "data": {
             "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "K-LCF"
-                }
-              },
               {
                 "type": "named",
                 "data": {
                   "name": "intakeCoral"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "K-LCF"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Ram"
+                      }
+                    }
+                  ]
                 }
               }
             ]

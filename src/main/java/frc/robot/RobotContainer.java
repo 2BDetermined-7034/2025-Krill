@@ -91,7 +91,7 @@ public class RobotContainer {
 		NamedCommands.registerCommand("intakeCoral", ArmElevatorFactory.intakeCoral(elevator, arm));
 		NamedCommands.registerCommand("Spin Intake", arm.spinIntakeCommand());
 		NamedCommands.registerCommand("Flick Outtake", arm.setArmAngle(ArmSubsystem.ScoringPosition.OuttakeFlick).andThen(new WaitCommand(0.5)));
-
+		NamedCommands.registerCommand("Ram", drivetrain.applyRequest(() -> driveCentric.withVelocityX(0.6)));
 
 	}
 
