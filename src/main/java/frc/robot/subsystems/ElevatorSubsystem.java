@@ -9,6 +9,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.*;
@@ -20,7 +21,6 @@ import static frc.robot.Constants.Elevator.*;
 public class ElevatorSubsystem extends SubsystemBase {
 	private final TalonFX masterMotor, slaveMotor;
 	private final CANcoder canCoder;
-	private Angle targetPosition;
 
 	public enum ElevatorPosition {
 		HOME(Rotations.of(0.02)),
@@ -28,7 +28,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 		INTAKE(Rotations.of(0.33)),
 		L2(Rotations.of(0.553223)),
 		L3(Rotations.of(1.222168)),
-		L4(Rotations.of(2.24));
+		L4(Rotations.of(2.22));
 //		L4(Rotations.of(2.174));
 
 		private final Angle scoringPosition;
@@ -114,8 +114,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 		canCoder.getConfigurator().apply(ccConfig);
 
 		new Trigger(DriverStation::isEnabled).onTrue(Commands.runOnce(() -> masterMotor.setControl(new CoastOut())));
-
-		targetPosition = ElevatorPosition.HOME.getAngle();
 	}
 
 	@Override
@@ -126,6 +124,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 	public Angle getElevatorAngle() {
 		return masterMotor.getPosition().getValue();
+	}
+	public AngularVelocity getElevatorVelocity() {
+		return masterMotor.getVelocity().getValue();
 	}
 
 	/**
@@ -164,7 +165,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 	 * @param elevatorPosition
 	 */
 	public Command setElevatorPositionSetpoint(Angle elevatorPosition) {
-		return setElevatorPosition(elevatorPosition).andThen(Commands.waitUntil(this::isAtSetpoint));
+		return setElevatorPosition(elevatorPosition).andThen(Commands.waitUntil(() -> isAtSetpoint(elevatorPosition)));
 	}
 
 	public Command setElevatorPositionSetpoint(ElevatorPosition elevatorPosition) {
@@ -188,7 +189,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 		);
 	}
 
-	public boolean isAtSetpoint() {
-		return getElevatorAngle().isNear(targetPosition, Rotations.of(0.04));
+	public boolean isAtSetpoint(Angle setpoint) {
+		return getElevatorAngle().isNear(setpoint, Rotations.of(0.1)) && getElevatorVelocity().lt(RotationsPerSecond.of(0.01));
 	}
 }

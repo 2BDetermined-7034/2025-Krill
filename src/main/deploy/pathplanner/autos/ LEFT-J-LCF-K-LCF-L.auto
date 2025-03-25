@@ -5,19 +5,19 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "sequential",
           "data": {
             "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "L4"
-                }
-              },
               {
                 "type": "path",
                 "data": {
                   "pathName": "LEFT-J"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L4 Elevator Setpoint"
                 }
               }
             ]
@@ -26,7 +26,7 @@
         {
           "type": "named",
           "data": {
-            "name": "1s Outtake"
+            "name": "0.5s Outtake"
           }
         },
         {
@@ -49,19 +49,19 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "sequential",
           "data": {
             "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "L4"
-                }
-              },
               {
                 "type": "path",
                 "data": {
                   "pathName": "LCF-K"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L4 Elevator Setpoint"
                 }
               }
             ]
@@ -70,7 +70,7 @@
         {
           "type": "named",
           "data": {
-            "name": "1s Outtake"
+            "name": "0.3s Outtake"
           }
         },
         {
@@ -93,19 +93,19 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "sequential",
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "L4"
+                  "pathName": "LCF-L"
                 }
               },
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "LCF-L "
+                  "name": "L4 Elevator Setpoint"
                 }
               }
             ]
@@ -114,7 +114,7 @@
         {
           "type": "named",
           "data": {
-            "name": "1s Outtake"
+            "name": "0.3s Outtake"
           }
         }
       ]

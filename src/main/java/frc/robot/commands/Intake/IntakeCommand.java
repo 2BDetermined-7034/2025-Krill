@@ -44,7 +44,7 @@ public class IntakeCommand extends Command {
 			if (arm.getIntakeMotor().getVelocity().getValue().in(RotationsPerSecond) < 2.0) {
 				if (time == 0.0) {
 					time = HALUtil.getFPGATime();
-				} else if (HALUtil.getFPGATime() - time >= 1e6) {
+				} else if (HALUtil.getFPGATime() - time >= 0.1e6) {
 					time = 0L;
 					return true;
 				}
