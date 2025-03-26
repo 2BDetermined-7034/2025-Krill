@@ -391,7 +391,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     /**
      *
      * @param tolerance some tolerance in inches
-     * @return if the robot's current position is within a circle of radius tolerance extending from either coral station april tag of the alliance
+     * @return whether the robot's current position is within a region marked by a square of length 2*tolerance centered around one of the coral station april tags
      */
     public boolean isNearCoralStation(double tolerance){
         if (RobotBase.isSimulation()){
