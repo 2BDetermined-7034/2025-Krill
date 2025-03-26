@@ -18,6 +18,7 @@ import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.Units;
@@ -391,16 +392,18 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     /**
      *
      * @param tolerance some tolerance in inches
-     * @return whether the robot's current position is within a region marked by a square of length 2*tolerance centered around one of the coral station april tags
+     * @return whether the robot's current position is within a circle of radius tolerance centered around the relevant coral station april tags
      */
     public boolean isNearCoralStation(double tolerance){
+        Translation2d redUpperCS = new Translation2d(657.37,291.2);
+        Translation2d redLowerCS = new Translation2d(657.37,25.8);
+        Translation2d blueUpperCS = new Translation2d(33.51,291.2);
+        Translation2d blueLowerCS = new Translation2d(33.51,25.8);
         if (RobotBase.isSimulation()){
-            return isNear(this.getPose().getMeasureX().in(Units.Inches), DriverStationSim.getAllianceStationId().equals(AllianceStationID.Blue1) || DriverStationSim.getAllianceStationId().equals(AllianceStationID.Blue2) || DriverStationSim.getAllianceStationId().equals(AllianceStationID.Blue3)  ? 33.51 : 657.37, tolerance)
-                    && (isNear(this.getPose().getMeasureY().in(Units.Inches), 291.2, tolerance)
-                    || isNear(this.getPose().getMeasureY().in(Units.Inches), 25.8, tolerance));
+            return this.getPose().getTranslation().getDistance((DriverStationSim.getAllianceStationId().equals(AllianceStationID.Blue1) || DriverStationSim.getAllianceStationId().equals(AllianceStationID.Blue2) || DriverStationSim.getAllianceStationId().equals(AllianceStationID.Blue3)) ? blueUpperCS : redUpperCS) < tolerance ||
+                    this.getPose().getTranslation().getDistance((DriverStationSim.getAllianceStationId().equals(AllianceStationID.Blue1) || DriverStationSim.getAllianceStationId().equals(AllianceStationID.Blue2) || DriverStationSim.getAllianceStationId().equals(AllianceStationID.Blue3)) ? blueLowerCS : redLowerCS) < tolerance;
         }
-        return isNear(this.getPose().getMeasureX().in(Units.Inches), DriverStation.getAlliance().get().equals(Alliance.Blue)  ? 33.51 : 657.37, tolerance)
-                && (isNear(this.getPose().getMeasureY().in(Units.Inches), 291.2, tolerance)
-                || isNear(this.getPose().getMeasureY().in(Units.Inches), 25.8, tolerance));
+        return this.getPose().getTranslation().getDistance(DriverStation.getAlliance().get().equals(Alliance.Blue) ? blueUpperCS : redUpperCS) < tolerance ||
+                this.getPose().getTranslation().getDistance(DriverStation.getAlliance().get().equals(Alliance.Blue) ? blueLowerCS : redLowerCS) < tolerance;
     }
 }
