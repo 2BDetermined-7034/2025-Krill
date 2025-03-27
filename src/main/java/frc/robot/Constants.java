@@ -35,5 +35,25 @@ public class Constants {
 		public static final int CLIMB_MOTOR_ID = 0;
 		public static final Current CURRENT_LIMIT = Amps.of(100);
 		public static final Angle CLIMB_TOLERANCE = Rotations.of(0.1);
+
+		public enum ClimbDirection {
+			POSITIVE,
+			NEGATIVE
+		}
+
+		public enum ClimbPositions {
+			CLIMB_HOME(Rotations.of(0)),
+			EXTENDED(Rotations.of(0.25));
+
+			private final Angle climbPosition;
+
+			ClimbPositions(Angle climbPosition) {
+				this.climbPosition = climbPosition;
+			}
+
+			public Angle getAngle() {
+				return climbPosition;
+			}
+		}
 	}
 }

@@ -72,8 +72,8 @@ public class RobotContainer {
 		autoChooser.addOption("2m", new PathPlannerAuto("2m"));
 		SmartDashboard.putData("Auto Chooser", autoChooser);
 
-		configureBindings();
 
+		configureBindings();
 
 	}
 
@@ -148,8 +148,8 @@ public class RobotContainer {
 		operatorController.povDown().whileTrue(elevator.setElevatorVoltage(Volts.of(-1)));
 		operatorController.povRight().onTrue(arm.setArmAngle(ArmSubsystem.ScoringPosition.IntakeCoralStation));
 
-		operatorController.L2().whileTrue(climb.Climb(Volts.of(7)));
-		operatorController.R2().whileTrue(climb.Climb(Volts.of(-7)));
+		operatorController.L2().whileTrue(climb.setClimbVoltage(Volts.of(7)));
+		operatorController.R2().whileTrue(climb.setClimbVoltage(Volts.of(-7)));
 
 		operatorController.R1().whileTrue(new IntakeCommand(arm));
 		operatorController.L1().whileTrue(new OuttakeCommand(arm));
