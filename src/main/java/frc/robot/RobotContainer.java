@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import frc.robot.commands.Auto.OTFInHouse;
 import frc.robot.commands.Auto.OTFPathFinding;
 import frc.robot.commands.Auto.PointAtCoralStation;
 import frc.robot.commands.Auto.PointAtReef;
@@ -54,6 +55,7 @@ public class RobotContainer {
 	private final SendableChooser<Command> autoChooser;
 
 	public RobotContainer() {
+
 		namedCommands();
 		boolean isCompetition = false;
 
@@ -121,7 +123,7 @@ public class RobotContainer {
 		));
 
 //		driverController.options().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-		driverController.square().whileTrue(OTFPathFinding.goToNearestReef(drivetrain));
+		driverController.square().whileTrue(OTFInHouse.pathFindToPose(drivetrain, () -> OTFPathFinding.getNearestReefLocation(drivetrain)));
 		driverController.triangle().whileTrue(OTFPathFinding.goToNearestCoralStation(drivetrain));
 		driverController.PS().whileTrue(arm.zero());
 //

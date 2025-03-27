@@ -12,12 +12,32 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
+import javax.sound.midi.Soundbank;
 import java.util.List;
 import java.util.Set;
 
 import static edu.wpi.first.units.Units.*;
 
 public class OTFPathFinding {
+
+	/**
+	 * Forces the initialization of the class pertaining to
+	 * the specified <tt>Class</tt> object.
+	 * This method does nothing if the class is already
+	 * initialized prior to invocation.
+	 *
+	 * @param klass the class for which to force initialization
+	 * @return <tt>klass</tt>
+
+	 */
+	public static <T> Class<T> forceInit(Class<T> klass) {
+		try {
+			Class.forName(klass.getName(), true, klass.getClassLoader());
+		} catch (ClassNotFoundException e) {
+			throw new AssertionError(e);  // Can't happen
+		}
+		return klass;
+	}
 
 	//edit to the positions that we want the robot to go to
 	//They are currently the positions of the april tags
@@ -95,13 +115,13 @@ public class OTFPathFinding {
 		);
 	}
 
-	private static Pose2d getNearestReefLocation(CommandSwerveDrivetrain drivebase) {
+	public static Pose2d getNearestReefLocation(CommandSwerveDrivetrain drivebase) {
 		boolean isBlue = DriverStation.getAlliance().get().equals(Alliance.Blue);
 
 		Translation2d reef = isBlue ? blueReef : redReef;
 
-		Distance distFromReef = Meters.of(0.872175 / 2.0).plus(Inches.of(32.74));
-		Distance distTangent = Inches.of(6); // 12.93775566 / 2
+		Distance distFromReef = Centimeters.of(44.5).plus(Inches.of(32.75));
+		Distance distTangent = Inches.of(6.5); // 12.93775566 / 2
 
 		Angle angleToReef = Rotations.of(drivebase.getPose().getTranslation().minus(reef).getAngle().getRotations());
 		Angle clampedAngle = Rotations.of(Math.round(angleToReef.in(Rotations) * 6.0) / 6.0);
