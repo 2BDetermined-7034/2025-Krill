@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.Auto.OTFInHouse;
 import frc.robot.commands.Auto.OTFPathFinding;
 import frc.robot.commands.Auto.PointAtCoralStation;
@@ -58,6 +59,9 @@ public class RobotContainer {
 
 		namedCommands();
 		boolean isCompetition = false;
+
+		new Trigger(() -> drivetrain.getPitch().abs(Degrees) >  Constants.TIP_THRESHOLD.in(Degrees) ||
+			drivetrain.getRoll().abs(Degrees) >  Constants.TIP_THRESHOLD.in(Degrees)).onTrue(elevator.setElevatorPosition(ElevatorPosition.HOME));
 
 		// Build an auto chooser. This will use Commands.none() as the default option.
 		// As an example, this will only show autos that start with "comp" while at

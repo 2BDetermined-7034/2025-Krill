@@ -1,10 +1,14 @@
 package frc.robot;
 
+import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.*;
 
 import static edu.wpi.first.units.Units.*;
 
 public class Constants {
+
+	public static final Angle TIP_THRESHOLD = Degrees.of(15);
+
 	public static final class Arm {
 		public static final int ARM_MOTOR_ID = 17;
 		public static final int INTAKE_MOTOR_ID = 16;
