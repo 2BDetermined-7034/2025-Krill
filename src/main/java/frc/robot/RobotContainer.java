@@ -151,6 +151,11 @@ public class RobotContainer {
 		operatorController.L2().whileTrue(climb.setClimbVoltage(Volts.of(7)));
 		operatorController.R2().whileTrue(climb.setClimbVoltage(Volts.of(-7)));
 
+		operatorController.PS().and(operatorController.L2()).onTrue(
+			climb.climbUntil(Constants.Climb.ClimbDirection.POSITIVE, Constants.Climb.ClimbPositions.EXTENDED, Volts.of(7.0)));
+		operatorController.PS().and(operatorController.R2()).onTrue(
+			climb.climbUntil(Constants.Climb.ClimbDirection.NEGATIVE, Constants.Climb.ClimbPositions.RETRACTED, Volts.of(-7.0)));
+
 		operatorController.R1().whileTrue(new IntakeCommand(arm));
 		operatorController.L1().whileTrue(new OuttakeCommand(arm));
 

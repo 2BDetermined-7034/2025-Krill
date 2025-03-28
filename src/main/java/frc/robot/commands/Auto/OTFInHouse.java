@@ -60,8 +60,8 @@ public class OTFInHouse {
 			return drive
 				.withVelocityX(velocity.getX())
 				.withVelocityY(velocity.getY())
-				.withRotationalRate(omegaVelocity + Math.signum(omegaVelocity) * 0.3);
+				.withRotationalRate(omegaVelocity + Math.signum(omegaVelocity) * 0.2);
 			}
-		));
+		)).andThen(Commands.print("OTF Pathfind Finished")).andThen(DriveForward.driveForward(drivetrain));
 	}
 }
