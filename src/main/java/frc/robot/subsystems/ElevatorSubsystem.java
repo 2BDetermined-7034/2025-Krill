@@ -9,6 +9,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.*;
@@ -20,16 +21,14 @@ import static frc.robot.Constants.Elevator.*;
 public class ElevatorSubsystem extends SubsystemBase {
 	private final TalonFX masterMotor, slaveMotor;
 	private final CANcoder canCoder;
-	private Angle targetPosition;
 
 	public enum ElevatorPosition {
 		HOME(Rotations.of(0.02)),
 		L1(Rotations.of(0.103027)),
-		INTAKE(Rotations.of(0.29)),
+		INTAKE(Rotations.of(0.33)),
 		L2(Rotations.of(0.553223)),
 		L3(Rotations.of(1.222168)),
-		L4(Rotations.of(2.24));
-//		L4(Rotations.of(2.174));
+		L4(Rotations.of(2.22));
 
 		private final Angle scoringPosition;
 
@@ -58,11 +57,11 @@ public class ElevatorSubsystem extends SubsystemBase {
 		upConfig.GravityType = GravityTypeValue.Elevator_Static;
 		upConfig.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 		upConfig.kS = 0.38;
-		upConfig.kV = 0.5;
+		upConfig.kV = 0.55;
 		upConfig.kA = 0.0;
-		upConfig.kG = 0.7;
-		upConfig.kP = 3;
-		upConfig.kI = 5.0;
+		upConfig.kG = 0.55;
+		upConfig.kP = 4;
+		upConfig.kI = 0.7;
 		upConfig.kD = 0.5;
 
 		Slot1Configs downConfig = talonFXConfigs.Slot1;
@@ -114,8 +113,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 		canCoder.getConfigurator().apply(ccConfig);
 
 		new Trigger(DriverStation::isEnabled).onTrue(Commands.runOnce(() -> masterMotor.setControl(new CoastOut())));
-
-		targetPosition = ElevatorPosition.HOME.getAngle();
 	}
 
 	@Override
@@ -126,6 +123,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 	public Angle getElevatorAngle() {
 		return masterMotor.getPosition().getValue();
+	}
+	public AngularVelocity getElevatorVelocity() {
+		return masterMotor.getVelocity().getValue();
 	}
 
 	/**
@@ -138,13 +138,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 			() -> {
 				if (angle.equals(ElevatorPosition.L4.getAngle())) {
 					masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(2));
-					System.out.println("SLOT2");
 				} else if (angle.lt(getElevatorAngle())) {
 					masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(1));
-					System.out.println("SLOT1");
 				} else {
 					masterMotor.setControl(new MotionMagicVoltage(angle).withSlot(0));
-					System.out.println("SLOT0");
 				}
 			},
 			() -> {},
@@ -154,16 +151,30 @@ public class ElevatorSubsystem extends SubsystemBase {
 	}
 
 	/**
-	 * Command to change the elevator position through MotionMagic
-	 * @param elevatorPosition the enum position
-	 * @return the command to set the elevator to the position
+	 * {@link ElevatorSubsystem#setElevatorPosition(Angle)}
+	 * @param elevatorPosition the angle setpoint of the elevator
+	 * @return
 	 */
 	public Command setElevatorPosition(ElevatorPosition elevatorPosition) {
 		return setElevatorPosition(elevatorPosition.getAngle());
 	}
 
 	/**
+	 * sets elevator position and then waits until it is at the setpoint and then stops.
+	 * @param elevatorPosition
+	 */
+	public Command setElevatorPositionSetpoint(Angle elevatorPosition) {
+		return setElevatorPosition(elevatorPosition).andThen(Commands.waitUntil(() -> isAtSetpoint(elevatorPosition)));
+	}
+
+	public Command setElevatorPositionSetpoint(ElevatorPosition elevatorPosition) {
+		return setElevatorPositionSetpoint(elevatorPosition.getAngle());
+
+	}
+
+	/**
 	 * Command to manually set the elevator motor voltage
+	 * after the command ends, switches to position control to hold its final position
 	 * @param volts voltage to set the elevator to
 	 * @return the command
 	 */
@@ -178,8 +189,12 @@ public class ElevatorSubsystem extends SubsystemBase {
 		);
 	}
 
-	public boolean isAtSetpoint() {
-//		return getElevatorAngle().isNear(targetPosition, Rotations.of(0.1));
-		return true;
+	/**
+	 * returns true when the elevator position is within position and velocity tolerance of a given setpoint
+	 * @param setpoint the setpoint to compare to
+	 * @return whether the elevator is within tolerance
+	 */
+	public boolean isAtSetpoint(Angle setpoint) {
+		return getElevatorAngle().isNear(setpoint, Rotations.of(0.1)) && getElevatorVelocity().lt(RotationsPerSecond.of(0.01));
 	}
 }

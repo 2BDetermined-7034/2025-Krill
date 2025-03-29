@@ -16,12 +16,12 @@ import java.util.function.Supplier;
 
 import static edu.wpi.first.units.Units.Rotations;
 
-public class PointAtCoralStation extends Command {
+public class PointAtCoralStation {
 	private static final Rotation2d blueRightCoralStationRot = new Rotation2d(Units.degreesToRadians(233.5));
 	private static final Rotation2d blueLeftCoralStationRot = new Rotation2d(Units.degreesToRadians(-233.5));
 
-	private static final Rotation2d redRightCoralStationRot = new Rotation2d(Units.degreesToRadians(-234)); //0.91629786
-	private static final Rotation2d redLeftCoralStationRot = new Rotation2d(Units.degreesToRadians(234)); //5.32325422
+	private static final Rotation2d redRightCoralStationRot = new Rotation2d(Units.degreesToRadians(-233.5)); //0.91629786
+	private static final Rotation2d redLeftCoralStationRot = new Rotation2d(Units.degreesToRadians(233.5)); //5.32325422
 
 
 	public static Command pointAtCoralStation(Supplier<Double> velocityX, Supplier<Double> velocityY, double deadband, CommandSwerveDrivetrain drivetrain) {

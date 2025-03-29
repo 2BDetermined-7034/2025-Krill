@@ -10,13 +10,13 @@ public class Constants {
 		public static final int INTAKE_MOTOR_ID = 16;
 		public static final int CANCODER_ID = 15;
 
-		public static final double CANCODER_OFFSET = 0.20556640625;
+		public static final double CANCODER_OFFSET = -0.410400390625;
 
 		public static final double GEAR_RATIO = 9.0;
 
 		public static final Current ARM_CURRENT_LIMIT = Amps.of(60.0);
-
-		// CANCODER OFFSET: 0.06666666666
+		public static final Angle HOME_POSITION = Degrees.of(-24.2);
+		public static final Current INTAKE_CURRENT = Amps.of(50);
 	}
 
 	public static final class Elevator {
@@ -35,5 +35,26 @@ public class Constants {
 		public static final int CLIMB_MOTOR_ID = 0;
 		public static final Current CURRENT_LIMIT = Amps.of(100);
 		public static final Angle CLIMB_TOLERANCE = Rotations.of(0.1);
+
+		public enum ClimbDirection {
+			POSITIVE,
+			NEGATIVE
+		}
+
+		public enum ClimbPositions {
+			CLIMB_HOME(Rotations.of(0)),
+			EXTENDED(Rotations.of(5.573242)),
+			RETRACTED(Rotations.of(-3.327));
+
+			private final Angle climbPosition;
+
+			ClimbPositions(Angle climbPosition) {
+				this.climbPosition = climbPosition;
+			}
+
+			public Angle getAngle() {
+				return climbPosition;
+			}
+		}
 	}
 }

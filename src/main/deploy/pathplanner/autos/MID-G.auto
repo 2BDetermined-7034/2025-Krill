@@ -11,7 +11,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "L4 Temp Auto"
+                  "name": "L4"
                 }
               },
               {
@@ -27,6 +27,12 @@
           "type": "named",
           "data": {
             "name": "1s Outtake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Flick Outtake"
           }
         }
       ]

@@ -14,10 +14,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-import frc.robot.commands.Auto.DriveForward;
+import frc.robot.commands.Auto.OTFInHouse;
 import frc.robot.commands.Auto.OTFPathFinding;
-import frc.robot.commands.Auto.PointAtReef;
 import frc.robot.commands.Auto.PointAtCoralStation;
+import frc.robot.commands.Auto.PointAtReef;
 import frc.robot.commands.Intake.IntakeCommand;
 import frc.robot.commands.Intake.OuttakeCommand;
 import frc.robot.commands.Reef.ArmElevatorFactory;
@@ -32,14 +32,12 @@ import static edu.wpi.first.units.Units.*;
 
 
 public class RobotContainer {
-	private final double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-	private final double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
-
 	public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 	public final ArmSubsystem arm = new ArmSubsystem();
 	public final ElevatorSubsystem elevator = new ElevatorSubsystem();
 	public final ClimbSubsystem climb = new ClimbSubsystem();
-
+	private final double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+	private final double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 	/* Setting up bindings for necessary control of the swerve drive platform */
 	private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
 		.withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -47,11 +45,9 @@ public class RobotContainer {
 	private final SwerveRequest.RobotCentric driveCentric = new SwerveRequest.RobotCentric()
 		.withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
 		.withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-
 	private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
 	private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 	private final Telemetry logger = new Telemetry(MaxSpeed);
-
 	//private final CommandXboxController joystick = new CommandXboxController(0);
 	private final CommandPS5Controller driverController = new CommandPS5Controller(0);
 	private final CommandPS5Controller operatorController = new CommandPS5Controller(1);
@@ -60,18 +56,7 @@ public class RobotContainer {
 
 	public RobotContainer() {
 
-		NamedCommands.registerCommand("L4", ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L4));
-		NamedCommands.registerCommand("L4 Temp Auto", ArmElevatorFactory.scoreCoralTempAuto(drivetrain, elevator, arm, ElevatorPosition.L4));
-		NamedCommands.registerCommand("L2", ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L2));
-		NamedCommands.registerCommand("Elevator Ground", elevator.setElevatorPosition(ElevatorPosition.HOME));
-
-		NamedCommands.registerCommand("Outtake", new OuttakeCommand(arm));
-		NamedCommands.registerCommand("1s Outtake", new OuttakeCommand(arm).withTimeout(Seconds.of(0.8)));
-		NamedCommands.registerCommand("intakeCoral", ArmElevatorFactory.intakeCoral(elevator, arm).andThen(new WaitCommand(0.2)));
-		NamedCommands.registerCommand("Spin Intake", arm.spinIntakeCommand());
-		NamedCommands.registerCommand("Flick Outtake", arm.setArmAngle(ArmSubsystem.ScoringPosition.OuttakeFlick).withTimeout(0.4));
-		NamedCommands.registerCommand("1s Drive Forward", DriveForward.driveForward(drivetrain));
-
+		namedCommands();
 		boolean isCompetition = false;
 
 		// Build an auto chooser. This will use Commands.none() as the default option.
@@ -87,8 +72,28 @@ public class RobotContainer {
 		autoChooser.addOption("2m", new PathPlannerAuto("2m"));
 		SmartDashboard.putData("Auto Chooser", autoChooser);
 
+
 		configureBindings();
 
+	}
+
+	private void namedCommands() {
+
+		NamedCommands.registerCommand("L4", ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L4));
+		NamedCommands.registerCommand("L4 Elevator Setpoint", ArmElevatorFactory.scoreCoralElevatorSetpoint(elevator, arm, ElevatorPosition.L4).andThen(new WaitCommand(.05)));
+
+		NamedCommands.registerCommand("L2", ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L2));
+		NamedCommands.registerCommand("Elevator Ground", elevator.setElevatorPosition(ElevatorPosition.INTAKE).andThen(arm.setArmAngle(ArmSubsystem.ScoringPosition.IntakeCoralStation)));
+
+		NamedCommands.registerCommand("Outtake", new OuttakeCommand(arm));
+		NamedCommands.registerCommand("1s Outtake", new OuttakeCommand(arm).withTimeout(Seconds.of(0.8)));
+		NamedCommands.registerCommand("0.5s Outtake", new OuttakeCommand(arm).withTimeout(Seconds.of(0.5)));
+		NamedCommands.registerCommand("0.3s Outtake", new OuttakeCommand(arm).withTimeout(Seconds.of(0.3)));
+
+		NamedCommands.registerCommand("intakeCoral", ArmElevatorFactory.intakeCoral(elevator, arm));
+		NamedCommands.registerCommand("Spin Intake", arm.spinIntakeCommand());
+		NamedCommands.registerCommand("Flick Outtake", arm.setArmAngle(ArmSubsystem.ScoringPosition.OuttakeFlick).andThen(new WaitCommand(0.5)));
+		NamedCommands.registerCommand("Ram", drivetrain.applyRequest(() -> driveCentric.withVelocityX(0.6)));
 
 	}
 
@@ -104,59 +109,64 @@ public class RobotContainer {
 			)
 		);
 
-		driverController.R2().whileTrue(
-			PointAtReef.pointAtReef(
-				() -> driverController.getLeftY() * MaxSpeed * -0.75,
-				() -> driverController.getLeftX() * MaxSpeed * -0.75,
-				MaxSpeed * 0.1,
-				drivetrain
-			)
-		);
-
-		driverController.L2().whileTrue(
-			PointAtCoralStation.pointAtCoralStation(
-				() -> driverController.getLeftY() * MaxSpeed * -0.75,
-				() -> driverController.getLeftX() * MaxSpeed * -0.75,
-				MaxSpeed * 0.1,
-				drivetrain
-			)
-		);
+		driverController.L1().whileTrue(PointAtReef.pointAtReef(
+			() -> driverController.getLeftY() * MaxSpeed * -0.75,
+			() -> driverController.getLeftX() * MaxSpeed * -0.75,
+			MaxSpeed * 0.1,
+			drivetrain
+		));
+		driverController.R1().whileTrue(PointAtCoralStation.pointAtCoralStation(
+			() -> driverController.getLeftY() * MaxSpeed * -0.75,
+			() -> driverController.getLeftX() * MaxSpeed * -0.75,
+			MaxSpeed * 0.1,
+			drivetrain
+		));
 
 //		driverController.options().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-		driverController.square().whileTrue(OTFPathFinding.goToNearestReef(drivetrain));
+		driverController.square().whileTrue(OTFInHouse.pathFindToPose(drivetrain, () -> OTFPathFinding.getNearestReefLocation(drivetrain)));
 		driverController.triangle().whileTrue(OTFPathFinding.goToNearestCoralStation(drivetrain));
 		driverController.PS().whileTrue(arm.zero());
+//
+//
 
 
-		for (int i = 0; i < 360; i += 45) {
-			final double angle = (i / -180.0f) * Math.PI;
-			driverController.pov(i).whileTrue(drivetrain.applyRequest(() ->
-				driveCentric.withVelocityX(Math.cos(angle) * 0.8 + 0.2).withVelocityY(Math.sin(angle) * 1.0)
-			));
-		}
+//		for (int i = 0; i < 360; i += 45) {
+//			final double angle = (i / -180.0f) * Math.PI;
+//			driverController.pov(i).whileTrue(drivetrain.applyRequest(() ->
+//				driveCentric.withVelocityX(Math.cos(angle) * 0.4 + 0.1).withVelocityY(Math.sin(angle) * 0.5)
+//			));
+//		}
+
+		driverController.povUp().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(0.5).withVelocityY(0)));
+		driverController.povDown().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(-0.5).withVelocityY(0)));
+		driverController.povLeft().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(0.1).withVelocityY(0.5)));
+		driverController.povRight().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(0.1).withVelocityY(-0.5)));
+
 
 		operatorController.povUp().whileTrue(elevator.setElevatorVoltage(Volts.of(2.0)));
 		operatorController.povLeft().whileTrue(ArmElevatorFactory.intakeCoral(elevator, arm));
 		operatorController.povDown().whileTrue(elevator.setElevatorVoltage(Volts.of(-1)));
 		operatorController.povRight().onTrue(arm.setArmAngle(ArmSubsystem.ScoringPosition.IntakeCoralStation));
 
-		operatorController.L2().whileTrue(climb.Climb(Volts.of(7)));
-		operatorController.R2().whileTrue(climb.Climb(Volts.of(-7)));
+		operatorController.L2().whileTrue(climb.setClimbVoltage(Volts.of(7)));
+		operatorController.R2().whileTrue(climb.setClimbVoltage(Volts.of(-7)));
+
+		operatorController.PS().and(operatorController.L2()).onTrue(
+			climb.climbUntil(Constants.Climb.ClimbDirection.POSITIVE, Constants.Climb.ClimbPositions.EXTENDED, Volts.of(7.0)));
+		operatorController.PS().and(operatorController.R2()).onTrue(
+			climb.climbUntil(Constants.Climb.ClimbDirection.NEGATIVE, Constants.Climb.ClimbPositions.RETRACTED, Volts.of(-7.0)));
 
 		operatorController.R1().whileTrue(new IntakeCommand(arm));
 		operatorController.L1().whileTrue(new OuttakeCommand(arm));
 
 
-		operatorController.options().onTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L1));
-		operatorController.triangle().onTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L4));
-		operatorController.square().onTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L3));
+		operatorController.options().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L1));
+		operatorController.triangle().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L4));
+		operatorController.square().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L3));
 		operatorController.circle().onTrue(elevator.setElevatorPosition(ElevatorPosition.HOME));
-		operatorController.cross().onTrue(ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L2));
-//
-//
+		operatorController.cross().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L2));
 
 		drivetrain.registerTelemetry(logger::telemeterize);
-
 	}
 
 	public Command getAutonomousCommand() {

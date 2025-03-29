@@ -9,15 +9,19 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
 
 public class ArmElevatorFactory {
-	public static Command scoreCoral(CommandSwerveDrivetrain swerveDrivetrain, ElevatorSubsystem elevator, ArmSubsystem arm, ElevatorSubsystem.ElevatorPosition elevatorPosition) {
+	public static Command scoreCoral(ElevatorSubsystem elevator, ArmSubsystem arm, ElevatorSubsystem.ElevatorPosition elevatorPosition) {
 		return new ParallelCommandGroup(
-			Commands.print("Command Starting"),
 			elevator.setElevatorPosition(elevatorPosition),
 			arm.setArmAngle(ArmSubsystem.ScoringPosition.Outtake)
-			//OTFPathFinding.goToNearestReef(swerveDrivetrain)
 		);
 	}
 
+	/**
+	 *
+	 * @param elevator
+	 * @param arm
+	 * @return
+	 */
 	public static Command intakeCoral(ElevatorSubsystem elevator, ArmSubsystem arm) {
 		return new ParallelCommandGroup(
 			Commands.print("intakeCoral Starting"),
@@ -27,12 +31,17 @@ public class ArmElevatorFactory {
 		).andThen(Commands.print("intakeCoral Ended"));
 	}
 
-	public static Command scoreCoralTempAuto(CommandSwerveDrivetrain swerveDrivetrain, ElevatorSubsystem elevator, ArmSubsystem arm, ElevatorSubsystem.ElevatorPosition elevatorPosition) {
+	/**
+	 * Same thing as score coral but waits for elevator to reach setpoint
+	 * @param elevator
+	 * @param arm
+	 * @param elevatorPosition
+	 * @return
+	 */
+	public static Command scoreCoralElevatorSetpoint(ElevatorSubsystem elevator, ArmSubsystem arm, ElevatorSubsystem.ElevatorPosition elevatorPosition) {
 		return new ParallelCommandGroup(
-			Commands.print("Command Starting"),
-			elevator.setElevatorPosition(elevatorPosition),
-			arm.setArmAngle(ArmSubsystem.ScoringPosition.OuttakeTempAuto)
-			//OTFPathFinding.goToNearestReef(swerveDrivetrain)
+			elevator.setElevatorPositionSetpoint(elevatorPosition),
+			arm.setArmAngle(ArmSubsystem.ScoringPosition.Outtake)
 		);
 	}
 }

@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.*;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
@@ -14,25 +13,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.Climb;
 
+
+
+
+
 public class ClimbSubsystem extends SubsystemBase {
 	TalonFX climbMotor = new TalonFX(Climb.CLIMB_MOTOR_ID, "rio");
-
-	public enum ClimbPositions {
-		HOME(Rotations.of(0.0)),
-		MATCH_START(Rotations.of(0.0)),
-		EXTENDED(Rotations.of(0.0)),
-		FINAL(Rotations.of(0.0));
-
-		private final Angle climbPosition;
-
-		ClimbPositions(Angle climbPosition) {
-			this.climbPosition = climbPosition;
-		}
-
-		public Angle getAngle() {
-			return climbPosition;
-		}
-	}
 
 	public ClimbSubsystem() {
 
@@ -63,29 +49,52 @@ public class ClimbSubsystem extends SubsystemBase {
 		slot0Configs.kD = 0;
 
 		climbMotor.getConfigurator().apply(talonFXConfigs);
+		climbMotor.setPosition(Rotations.of(0));
 
 	}
 
-	public Command Climb(Voltage voltageOut) {
+	public Angle getClimbPosition() {
+		return climbMotor.getPosition().getValue();
+	}
+
+	/**
+	 * Returns a command which supplies the climb motor with a constant voltage
+	 *
+	 * @param voltageOut the voltage to supply
+	 * @return the command to run
+	 */
+	public Command setClimbVoltage(Voltage voltageOut) {
 		return new FunctionalCommand(
 			() -> climbMotor.setControl(new VoltageOut(voltageOut)),
 			() -> climbMotor.setControl(new VoltageOut(voltageOut)),
 			(interrupted) -> climbMotor.setControl(new VoltageOut(Volts.of(0.0))),
-			() -> false
+			() -> false,
+			this
 		);
 	}
 
-	public Command climbToPosition(Angle angle) {
+	public Command climbUntil(Climb.ClimbDirection direction, Angle angle, Voltage voltage) {
 		return new FunctionalCommand(
-			() -> climbMotor.setControl(new MotionMagicVoltage(angle)),
-			() -> {},
-			(interrupted) -> {},
-			() -> climbMotor.getPosition().getValue().isNear(angle, Climb.CLIMB_TOLERANCE)
+			() -> climbMotor.setControl((new VoltageOut(voltage))),
+			() -> {
+			},
+			(interrupted) -> climbMotor.setControl(new VoltageOut(0.0)),
+			() -> {
+				if (direction == Climb.ClimbDirection.POSITIVE && getClimbPosition().gt(angle)) {
+					return true;
+				} else if (direction == Climb.ClimbDirection.NEGATIVE && getClimbPosition().lt(angle)) {
+					return true;
+				}
+				return false;
+
+			},
+			this
 		);
 	}
 
-	public Command climbToPosition(ClimbPositions climbPosition) {
-		return climbToPosition(climbPosition.getAngle());
+	public Command climbUntil(Climb.ClimbDirection direction, Climb.ClimbPositions position, Voltage voltage) {
+		return climbUntil(direction, position.getAngle(), voltage);
 	}
+
 
 }

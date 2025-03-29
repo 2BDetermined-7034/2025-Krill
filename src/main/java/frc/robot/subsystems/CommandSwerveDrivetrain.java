@@ -18,13 +18,13 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.generated.TunerConstants;
@@ -290,7 +290,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     ),
                     new PPHolonomicDriveController(
                             // PID constants for translation
-                            new PIDConstants(14, 0, 0),
+                            new PIDConstants(10, 0, 0),
                             // PID constants for rotation
                             new PIDConstants(7, 0, 0)
                     ),
@@ -345,7 +345,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Command driveToPose(Pose2d pose) {
         // Create the constraints to use while pathfinding
         PathConstraints constraints = new PathConstraints(
-                TunerConstants.kSpeedAt12Volts, MetersPerSecondPerSecond.of(3),
+                TunerConstants.kSpeedAt12Volts, MetersPerSecondPerSecond.of(2.3),
                 DegreesPerSecond.of(540), DegreesPerSecondPerSecond.of(720));
 
         // Since AutoBuilder is configured, we can use it to build pathfinding commands
@@ -379,4 +379,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Pose2d getPose() {
         return super.getState().Pose;
     }
+
+    public Angle getRoll() {return super.getPigeon2().getRoll().getValue();}
+
+    public Angle getPitch() {return super.getPigeon2().getPitch().getValue();}
+
+
 }

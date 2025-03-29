@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ArmSubsystem;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.Arm.INTAKE_CURRENT;
 
 public class IntakeCommand extends Command {
 	private final ArmSubsystem arm;
@@ -21,7 +22,7 @@ public class IntakeCommand extends Command {
 	@Override
 	public void initialize() {
 		overcameInitial = false;
-		arm.getIntakeMotor().setControl(new TorqueCurrentFOC(60.0));
+		arm.getIntakeMotor().setControl(new TorqueCurrentFOC(INTAKE_CURRENT));
 		time = 0L;
 	}
 
@@ -43,7 +44,7 @@ public class IntakeCommand extends Command {
 			if (arm.getIntakeMotor().getVelocity().getValue().in(RotationsPerSecond) < 2.0) {
 				if (time == 0.0) {
 					time = HALUtil.getFPGATime();
-				} else if (HALUtil.getFPGATime() - time >= 1e6) {
+				} else if (HALUtil.getFPGATime() - time >= 0.1e6) {
 					time = 0L;
 					return true;
 				}
