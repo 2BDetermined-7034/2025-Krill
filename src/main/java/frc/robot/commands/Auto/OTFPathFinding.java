@@ -1,20 +1,33 @@
 package frc.robot.commands.Auto;
 
+import com.ctre.phoenix6.swerve.SwerveRequest;
+import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 import javax.sound.midi.Soundbank;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -166,5 +179,38 @@ public class OTFPathFinding {
 		}
 		Pose2d nearest = currentPose.nearest(List.of(RC_RED, LC_RED));
 		return drivebase.driveToPose(nearest);
+	}
+
+	public static Command pathfindToPose(CommandSwerveDrivetrain drivetrain, Supplier<Pose2d> setpointSupplier) {
+//		ProfiledPIDController xController = new ProfiledPIDController(
+//			2.0, 0.0, 0.0,
+//			new TrapezoidProfile.Constraints(4.0, 3.5)
+//		);
+//		ProfiledPIDController yController = new ProfiledPIDController(
+//			2.0, 0.0, 0.0,
+//			new TrapezoidProfile.Constraints(4.0, 3.5)
+//		);
+		PIDController xController = new PIDController(3, 0, 0);
+		PIDController yController = new PIDController(3, 0, 0);
+//		ProfiledPIDController thetaController = new ProfiledPIDController(
+//			5, 0.0, 0.0,
+//			new TrapezoidProfile.Constraints(2.0, 1.0)
+//		);
+		PIDController thetaController = new PIDController(5, 0, 0);
+		thetaController.enableContinuousInput(-0.5, 0.5);
+
+		var swerveRequest = new SwerveRequest.FieldCentric();
+
+		return drivetrain.applyRequest(() -> {
+
+
+			var vx = -xController.calculate(drivetrain.getPose().getX(), setpointSupplier.get().getX());
+			var vy = -yController.calculate(drivetrain.getPose().getY(), setpointSupplier.get().getY());
+			var w = thetaController.calculate(drivetrain.getPose().getRotation().getRotations(), setpointSupplier.get().getRotation().getRotations());
+
+			SmartDashboard.putNumber("OTF pathfind error", drivetrain.getPose().getTranslation().getDistance(setpointSupplier.get().getTranslation()));
+
+			return swerveRequest.withVelocityX(vx).withVelocityY(vy).withRotationalRate(w);
+		});
 	}
 }

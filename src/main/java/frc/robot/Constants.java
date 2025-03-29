@@ -10,7 +10,7 @@ public class Constants {
 		public static final int INTAKE_MOTOR_ID = 16;
 		public static final int CANCODER_ID = 15;
 
-		public static final double CANCODER_OFFSET = -0.410400390625;
+		public static final double CANCODER_OFFSET = -0.41552734375;
 
 		public static final double GEAR_RATIO = 9.0;
 
