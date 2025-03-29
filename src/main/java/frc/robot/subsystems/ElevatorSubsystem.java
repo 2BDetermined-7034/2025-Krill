@@ -68,7 +68,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 		downConfig.GravityType = GravityTypeValue.Elevator_Static;
 		downConfig.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 		downConfig.kS = 0.38;
-		downConfig.kV = 0.35;
+		downConfig.kV = 0.39;
 		downConfig.kA = 0.0;
 		downConfig.kG = 0.6;
 		downConfig.kP = 5;
