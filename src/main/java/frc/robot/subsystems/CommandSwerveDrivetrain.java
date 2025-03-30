@@ -16,6 +16,7 @@ import com.pathplanner.lib.path.Waypoint;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
@@ -362,8 +363,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public Command getPathFromWaypoint(Pose2d waypoint) {
+        Pose2d diff = waypoint.relativeTo(getPose());
+        Pose2d midpoint = getPose().plus(new Transform2d(diff.div(2).getTranslation(),diff.getRotation()));
+
         List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
                 new Pose2d(getPose().getTranslation(), getPathVelocityHeading(getState().Speeds, waypoint)),
+                midpoint, // force rotation at the modpoint
                 waypoint
         );
 

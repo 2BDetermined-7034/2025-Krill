@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 import static edu.wpi.first.units.Units.*;
 
 /**
- * This should be defferred
+ * This should be deferred, use {@link PathfindHolonomicPID#generateCommand} as a constructor instead
  */
 public class PathfindHolonomicPID extends Command {
     private static final Distance POSITION_TOLERANCE = Centimeters.of(1);
@@ -37,8 +37,8 @@ public class PathfindHolonomicPID extends Command {
     private final Trigger endTrigger;
     private final Trigger endTriggerDebounced;
     private final PPHolonomicDriveController driveController = new PPHolonomicDriveController(
-            new PIDConstants(7, 0, 0),
-            new PIDConstants(8, 0, 0)
+            new PIDConstants(10, 0, 0),
+            new PIDConstants(7, 0, 0)
     );
 
 

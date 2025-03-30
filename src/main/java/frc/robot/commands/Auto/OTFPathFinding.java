@@ -64,8 +64,8 @@ public class OTFPathFinding {
 
 		Translation2d reef = isBlue ? blueReef : redReef;
 
-		Distance distFromReef = Centimeters.of(44.5).plus(Inches.of(32.75));
-		Distance distTangent = Inches.of(6.5); // 12.93775566 / 2
+		Distance distFromReef = Centimeters.of(44.5).plus(Inches.of(32.75)).plus(Inches.of(0 /* Arbitrary */));
+		Distance distTangent = Inches.of(6.5).plus(Inches.of(0 /*Arbitrary */)); // 12.93775566 / 2
 
 		Angle angleToReef = Rotations.of(drivebase.getPose().getTranslation().minus(reef).getAngle().getRotations());
 		Angle clampedAngle = Rotations.of(Math.round(angleToReef.in(Rotations) * 6.0) / 6.0);

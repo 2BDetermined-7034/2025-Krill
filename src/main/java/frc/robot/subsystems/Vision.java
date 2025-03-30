@@ -64,20 +64,20 @@ public class Vision {
 				new Rotation3d(Degrees.of(0), Degrees.of(-9.3), Degrees.of(0))
 			),
 			PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-			VecBuilder.fill(3, 3, 0.5),
-			VecBuilder.fill(0.5, 0.5, 0.5)
-		),
-
-		BACK_CAM(
-			"back",
-			new Transform3d(
-				new Translation3d(Meters.of(-0.355), Meters.of(0), Meters.of(0.1875)),
-				new Rotation3d(Degrees.of(0), Degrees.of(-19), Degrees.of(180.0))
-			),
-			PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-			VecBuilder.fill(3, 3, 0.5),
-			VecBuilder.fill(0.5, 0.5, 0.5)
+			VecBuilder.fill(3, 3, 0.7),
+			VecBuilder.fill(0.5, 0.5, 0.7)
 		);
+
+//		BACK_CAM(
+//			"back",
+//			new Transform3d(
+//				new Translation3d(Meters.of(-0.355), Meters.of(0), Meters.of(0.1875)),
+//				new Rotation3d(Degrees.of(0), Degrees.of(-19), Degrees.of(180.0))
+//			),
+//			PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+//			VecBuilder.fill(3, 3, 0.5),
+//			VecBuilder.fill(0.5, 0.5, 0.5)
+//		);
 
 
 		private final PhotonCamera photonCamera;

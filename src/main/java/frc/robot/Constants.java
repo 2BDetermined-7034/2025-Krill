@@ -16,7 +16,7 @@ public class Constants {
 
         public static final Time OTF_TIMEOUT = Seconds.of(1.5);
 
-        public static final LinearVelocity GOAL_END_VELOCITY = MetersPerSecond.of(1);
+        public static final LinearVelocity GOAL_END_VELOCITY = MetersPerSecond.of(0.7);
     }
 
     public static final class Arm {
@@ -58,7 +58,7 @@ public class Constants {
         public enum ClimbPositions {
             CLIMB_HOME(Rotations.of(0)),
             EXTENDED(Rotations.of(5.573242)),
-            RETRACTED(Rotations.of(-3.327));
+            RETRACTED(Rotations.of(-3));
 
             private final Angle climbPosition;
 
