@@ -28,7 +28,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 		INTAKE(Rotations.of(0.33)),
 		L2(Rotations.of(0.553223)),
 		L3(Rotations.of(1.222168)),
-		L4(Rotations.of(2.22));
+		L4(Rotations.of(2.24
+		));
 
 		private final Angle scoringPosition;
 
@@ -68,7 +69,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 		downConfig.GravityType = GravityTypeValue.Elevator_Static;
 		downConfig.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 		downConfig.kS = 0.38;
-		downConfig.kV = 0.35;
+		downConfig.kV = 0.39;
 		downConfig.kA = 0.0;
 		downConfig.kG = 0.6;
 		downConfig.kP = 5;
@@ -79,12 +80,12 @@ public class ElevatorSubsystem extends SubsystemBase {
 		level4Config.GravityType = GravityTypeValue.Elevator_Static;
 		level4Config.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 		level4Config.kS = 0.55;
-		level4Config.kV = 0.45;
+		level4Config.kV = 0.47;
 		level4Config.kA = 0.0;
 		level4Config.kG = 0.7;
-		level4Config.kP = 3;
+		level4Config.kP = 10;
 		level4Config.kI = 0.8;
-		level4Config.kD = 0.5;
+		level4Config.kD = 1;
 
 
 		MotorOutputConfigs moConfig = talonFXConfigs.MotorOutput;

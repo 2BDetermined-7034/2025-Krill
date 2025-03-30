@@ -18,13 +18,15 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import edu.wpi.first.wpilibj.RobotBase;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
-import javax.sound.midi.Soundbank;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -32,62 +34,6 @@ import java.util.function.Supplier;
 import static edu.wpi.first.units.Units.*;
 
 public class OTFPathFinding {
-
-	/**
-	 * Forces the initialization of the class pertaining to
-	 * the specified <tt>Class</tt> object.
-	 * This method does nothing if the class is already
-	 * initialized prior to invocation.
-	 *
-	 * @param klass the class for which to force initialization
-	 * @return <tt>klass</tt>
-
-	 */
-	public static <T> Class<T> forceInit(Class<T> klass) {
-		try {
-			Class.forName(klass.getName(), true, klass.getClassLoader());
-		} catch (ClassNotFoundException e) {
-			throw new AssertionError(e);  // Can't happen
-		}
-		return klass;
-	}
-
-	//edit to the positions that we want the robot to go to
-	//They are currently the positions of the april tags
-
-	// private static final Pose2d[] bluePoseArray = new Pose2d[]
-	// 	{
-	// 		new Pose2d(3.920,3.305,new Rotation2d(240)),
-	// 		new Pose2d(3.458,4.967,new Rotation2d(180)),
-	// 		new Pose2d(4.920,4.750,new Rotation2d(120)),
-	// 		new Pose2d(4.902,4.950,new Rotation2d(60)),
-	// 		new Pose2d(5.535,4.233,new Rotation2d(0)),
-	// 		new Pose2d(5.102,3.305,new Rotation2d(300)),
-
-	// 		new Pose2d(4.080,3.105,new Rotation2d(240)),
-	// 		new Pose2d(3.258,4.233,new Rotation2d(180)),
-	// 		new Pose2d(4.080,4.950,new Rotation2d(120)),
-	// 		new Pose2d(5.102,4.750,new Rotation2d(60)),
-	// 		new Pose2d(5.535,4.967,new Rotation2d(0)),
-	// 		new Pose2d(4.902,3.105,new Rotation2d(300))
-	// 	};
-
-	// private static final Pose2d[] redPoseArray = new Pose2d[]
-	// 	{
-	// 		new Pose2d(13.693,3.305,new Rotation2d(240)),
-	// 		new Pose2d(14.102,4.233,new Rotation2d(180)),
-	// 		new Pose2d(13.493,4.950,new Rotation2d(120)),
-	// 		new Pose2d(12.450,4.950,new Rotation2d(60)),
-	// 		new Pose2d(12.033,4.967,new Rotation2d(0)),
-	// 		new Pose2d(12.650,3.105,new Rotation2d(300)),
-
-	// 		new Pose2d(13.493,3.205,new Rotation2d(240)),
-	// 		new Pose2d(14.102,3.967,new Rotation2d(180)),
-	// 		new Pose2d(13.893,4.750,new Rotation2d(120)),
-	// 		new Pose2d(12.650,4.950,new Rotation2d(60)),
-	// 		new Pose2d(12.033,4.233,new Rotation2d(0)),
-	// 		new Pose2d(12.450,3.305,new Rotation2d(300))
-	// 	};
 
 	private static final Translation2d redReef = new Translation2d(Units.inchesToMeters(514.13), Units.inchesToMeters(158.5));
 	private static final Translation2d blueReef = new Translation2d(Units.inchesToMeters(176.745), Units.inchesToMeters(158.5));
@@ -105,6 +51,12 @@ public class OTFPathFinding {
 		Meters.of(16.41495132446289), Meters.of(7.076528072357178),
 		new Rotation2d(Degrees.of(54)));
 
+	public enum ReefSide {
+		LEFT,
+		RIGHT,
+		NEAREST;
+	}
+
 	// public static Command goToPose(SwerveSubsystem swerve, int scoreLocation) {
 	// 	Alliance alliance = DriverStation.getAlliance().get();
 	// 	if(alliance == Alliance.Blue) {
@@ -121,44 +73,64 @@ public class OTFPathFinding {
 	 * @return command to pathfind to the most optimal scoring location,
 	 * trying to align with the driver's intent
 	 */
-	public static Command goToNearestReef(CommandSwerveDrivetrain drivebase) {
+	public static Command goToNearestReef(CommandSwerveDrivetrain drivebase, ReefSide reefSide) {
 		return new DeferredCommand(
-			() -> drivebase.driveToPose(getNearestReefLocation(drivebase)),
+			() -> drivebase.getPathFromWaypoint(getNearestReefLocation(drivebase, reefSide)),
 			Set.of()
 		);
 	}
 
-	public static Pose2d getNearestReefLocation(CommandSwerveDrivetrain drivebase) {
-		boolean isBlue = DriverStation.getAlliance().get().equals(Alliance.Blue);
+
+
+
+	/**
+	 * Finds the nearest branch location based on the current pose of the drivebase.
+	 *
+	 * @param drivebase The swerve subsystem
+	 * @param reefSide An enum indicating whether to find the left branch or right branch
+	 * @return The nearest branch location as a Pose2d object
+	 */
+	public static Pose2d getNearestReefLocation(CommandSwerveDrivetrain drivebase, ReefSide reefSide) {
+		boolean isBlue = RobotBase.isReal() && DriverStation.getAlliance().get().equals(Alliance.Blue); // default to red alliance in the Sim
 
 		Translation2d reef = isBlue ? blueReef : redReef;
 
-		Distance distFromReef = Centimeters.of(44.5).plus(Inches.of(32.75));
-		Distance distTangent = Inches.of(6.5); // 12.93775566 / 2
+		Distance distFromReef = Centimeters.of(44.5).plus(Inches.of(32.75)).plus(Inches.of(0 /* Arbitrary */));
+		Distance distTangent = Inches.of(6.5).plus(Inches.of(0 /*Arbitrary */)); // 12.93775566 / 2
 
 		Angle angleToReef = Rotations.of(drivebase.getPose().getTranslation().minus(reef).getAngle().getRotations());
 		Angle clampedAngle = Rotations.of(Math.round(angleToReef.in(Rotations) * 6.0) / 6.0);
 
 		Translation2d translationFromReef = new Translation2d(
-			distFromReef.in(Meters) * Math.cos(clampedAngle.in(Radians)),
-			distFromReef.in(Meters) * Math.sin(clampedAngle.in(Radians)));
+				distFromReef.in(Meters) * Math.cos(clampedAngle.in(Radians)),
+				distFromReef.in(Meters) * Math.sin(clampedAngle.in(Radians)));
 
-		Translation2d tangentLeft = new Translation2d(
-			distTangent.in(Meters) * -Math.sin(clampedAngle.in(Radians)),
-			distTangent.in(Meters) * Math.cos(clampedAngle.in(Radians))
+		Translation2d tangentRight = new Translation2d(
+				distTangent.in(Meters) * -Math.sin(clampedAngle.in(Radians)),
+				distTangent.in(Meters) * Math.cos(clampedAngle.in(Radians))
 		);
-		Translation2d tangentRight = tangentLeft.times(-1);
+		Translation2d tangentLeft = tangentRight.times(-1);
 
 		Pose2d poseLeft = new Pose2d(
-			reef.plus(translationFromReef).plus(tangentLeft),
-			new Rotation2d(clampedAngle).rotateBy(Rotation2d.fromDegrees(180))
+				reef.plus(translationFromReef).plus(tangentLeft),
+				new Rotation2d(clampedAngle).rotateBy(Rotation2d.fromDegrees(180))
 		);
 		Pose2d poseRight = new Pose2d(
-			reef.plus(translationFromReef).plus(tangentRight),
-			new Rotation2d(clampedAngle).rotateBy(Rotation2d.fromDegrees(180))
+				reef.plus(translationFromReef).plus(tangentRight),
+				new Rotation2d(clampedAngle).rotateBy(Rotation2d.fromDegrees(180))
 		);
 
-		return drivebase.getPose().nearest(List.of(poseLeft, poseRight));
+		switch (reefSide) {
+			case LEFT -> {
+				return poseLeft;
+			}
+			case RIGHT -> {
+				return poseRight;
+			}
+			default -> {
+				return drivebase.getPose().nearest(List.of(poseLeft, poseRight));
+			}
+		}
 	}
 
 
@@ -170,15 +142,15 @@ public class OTFPathFinding {
 	}
 
 	private static Command goToNearestCoralStationUndeferred(CommandSwerveDrivetrain drivebase) {
-		boolean isBlue = DriverStation.getAlliance().get().equals(Alliance.Blue);
+		boolean isBlue = RobotBase.isReal() && DriverStation.getAlliance().get().equals(Alliance.Blue); // default to red alliance in the Sim
 		Pose2d currentPose = drivebase.getPose();
 
 		if (isBlue) {
 			Pose2d nearest = currentPose.nearest(List.of(RC_BLUE, LC_BLUE));
-			return drivebase.driveToPose(nearest);
+			return drivebase.getPathFromWaypoint(nearest);
 		}
 		Pose2d nearest = currentPose.nearest(List.of(RC_RED, LC_RED));
-		return drivebase.driveToPose(nearest);
+		return drivebase.getPathFromWaypoint(nearest);
 	}
 
 	public static Command pathfindToPose(CommandSwerveDrivetrain drivetrain, Supplier<Pose2d> setpointSupplier) {
