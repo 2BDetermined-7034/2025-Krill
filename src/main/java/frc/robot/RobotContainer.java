@@ -9,6 +9,9 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -122,9 +125,11 @@ public class RobotContainer {
 		));
 
 //		driverController.options().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+
 //		driverController.square().whileTrue(OTFPathFinding.goToNearestReef(drivetrain));
 		driverController.square().whileTrue(OTFPathFinding.goToNearestReef(drivetrain, OTFPathFinding.ReefSide.LEFT));
 		driverController.circle().whileTrue(OTFPathFinding.goToNearestReef(drivetrain, OTFPathFinding.ReefSide.RIGHT));
+
 		driverController.triangle().whileTrue(OTFPathFinding.goToNearestCoralStation(drivetrain));
 		driverController.PS().whileTrue(arm.zero());
 //
@@ -143,6 +148,7 @@ public class RobotContainer {
 		driverController.povLeft().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(0.1).withVelocityY(0.5)));
 		driverController.povRight().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(0.1).withVelocityY(-0.5)));
 
+		drivetrain.resetPose(new Pose2d(new Translation2d(13.91, 3.14), new Rotation2d(128.17)));
 
 		operatorController.povUp().whileTrue(elevator.setElevatorVoltage(Volts.of(2.0)));
 		operatorController.povLeft().whileTrue(ArmElevatorFactory.intakeCoral(elevator, arm));
