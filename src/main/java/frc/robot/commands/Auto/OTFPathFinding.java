@@ -36,6 +36,12 @@ public class OTFPathFinding {
 		Meters.of(16.41495132446289), Meters.of(7.076528072357178),
 		new Rotation2d(Degrees.of(54)));
 
+	public enum ReefSide {
+		LEFT,
+		RIGHT,
+		NEAREST;
+	}
+
 	// public static Command goToPose(SwerveSubsystem swerve, int scoreLocation) {
 	// 	Alliance alliance = DriverStation.getAlliance().get();
 	// 	if(alliance == Alliance.Blue) {
@@ -52,14 +58,24 @@ public class OTFPathFinding {
 	 * @return command to pathfind to the most optimal scoring location,
 	 * trying to align with the driver's intent
 	 */
-	public static Command goToNearestReef(CommandSwerveDrivetrain drivebase) {
+	public static Command goToNearestReef(CommandSwerveDrivetrain drivebase, ReefSide reefSide) {
 		return new DeferredCommand(
-			() -> drivebase.getPathFromWaypoint(getNearestReefLocation(drivebase)),
+			() -> drivebase.getPathFromWaypoint(getNearestReefLocation(drivebase, reefSide)),
 			Set.of()
 		);
 	}
 
-	public static Pose2d getNearestReefLocation(CommandSwerveDrivetrain drivebase) {
+
+
+
+	/**
+	 * Finds the nearest branch location based on the current pose of the drivebase.
+	 *
+	 * @param drivebase The swerve subsystem
+	 * @param reefSide An enum indicating whether to find the left branch or right branch
+	 * @return The nearest branch location as a Pose2d object
+	 */
+	public static Pose2d getNearestReefLocation(CommandSwerveDrivetrain drivebase, ReefSide reefSide) {
 		boolean isBlue = RobotBase.isReal() && DriverStation.getAlliance().get().equals(Alliance.Blue); // default to red alliance in the Sim
 
 		Translation2d reef = isBlue ? blueReef : redReef;
@@ -71,25 +87,35 @@ public class OTFPathFinding {
 		Angle clampedAngle = Rotations.of(Math.round(angleToReef.in(Rotations) * 6.0) / 6.0);
 
 		Translation2d translationFromReef = new Translation2d(
-			distFromReef.in(Meters) * Math.cos(clampedAngle.in(Radians)),
-			distFromReef.in(Meters) * Math.sin(clampedAngle.in(Radians)));
+				distFromReef.in(Meters) * Math.cos(clampedAngle.in(Radians)),
+				distFromReef.in(Meters) * Math.sin(clampedAngle.in(Radians)));
 
-		Translation2d tangentLeft = new Translation2d(
-			distTangent.in(Meters) * -Math.sin(clampedAngle.in(Radians)),
-			distTangent.in(Meters) * Math.cos(clampedAngle.in(Radians))
+		Translation2d tangentRight = new Translation2d(
+				distTangent.in(Meters) * -Math.sin(clampedAngle.in(Radians)),
+				distTangent.in(Meters) * Math.cos(clampedAngle.in(Radians))
 		);
-		Translation2d tangentRight = tangentLeft.times(-1);
+		Translation2d tangentLeft = tangentRight.times(-1);
 
 		Pose2d poseLeft = new Pose2d(
-			reef.plus(translationFromReef).plus(tangentLeft),
-			new Rotation2d(clampedAngle).rotateBy(Rotation2d.fromDegrees(180))
+				reef.plus(translationFromReef).plus(tangentLeft),
+				new Rotation2d(clampedAngle).rotateBy(Rotation2d.fromDegrees(180))
 		);
 		Pose2d poseRight = new Pose2d(
-			reef.plus(translationFromReef).plus(tangentRight),
-			new Rotation2d(clampedAngle).rotateBy(Rotation2d.fromDegrees(180))
+				reef.plus(translationFromReef).plus(tangentRight),
+				new Rotation2d(clampedAngle).rotateBy(Rotation2d.fromDegrees(180))
 		);
 
-		return drivebase.getPose().nearest(List.of(poseLeft, poseRight));
+		switch (reefSide) {
+			case LEFT -> {
+				return poseLeft;
+			}
+			case RIGHT -> {
+				return poseRight;
+			}
+			default -> {
+				return drivebase.getPose().nearest(List.of(poseLeft, poseRight));
+			}
+		}
 	}
 
 
