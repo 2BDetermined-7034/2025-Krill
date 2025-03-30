@@ -36,6 +36,12 @@ public class OTFPathFinding {
 		Meters.of(16.41495132446289), Meters.of(7.076528072357178),
 		new Rotation2d(Degrees.of(54)));
 
+	public enum ReefSide {
+		LEFT,
+		RIGHT,
+		NEAREST;
+	}
+
 	// public static Command goToPose(SwerveSubsystem swerve, int scoreLocation) {
 	// 	Alliance alliance = DriverStation.getAlliance().get();
 	// 	if(alliance == Alliance.Blue) {
@@ -52,34 +58,24 @@ public class OTFPathFinding {
 	 * @return command to pathfind to the most optimal scoring location,
 	 * trying to align with the driver's intent
 	 */
-	public static Command goToNearestReef(CommandSwerveDrivetrain drivebase) {
+	public static Command goToNearestReef(CommandSwerveDrivetrain drivebase, ReefSide reefSide) {
 		return new DeferredCommand(
-			() -> drivebase.getPathFromWaypoint(getNearestReefLocation(drivebase)),
+			() -> drivebase.getPathFromWaypoint(getNearestReefLocation(drivebase, reefSide)),
 			Set.of()
 		);
 	}
 
-	public static Command goToLeftBranch(CommandSwerveDrivetrain drivebase) {
-		return new DeferredCommand(
-				() -> drivebase.getPathFromWaypoint(getNearestLeftBranch(drivebase)),
-				Set.of()
-		);
-	}
 
-	public static Command goToRightBranch(CommandSwerveDrivetrain drivebase) {
-		return new DeferredCommand(
-				() -> drivebase.getPathFromWaypoint(getNearestRightBranch(drivebase)),
-				Set.of()
-		);
-	}
+
 
 	/**
 	 * Finds the nearest branch location based on the current pose of the drivebase.
 	 *
 	 * @param drivebase The swerve subsystem
+	 * @param reefSide An enum indicating whether to find the left branch or right branch
 	 * @return The nearest branch location as a Pose2d object
 	 */
-	public static Pose2d getNearestReefLocation(CommandSwerveDrivetrain drivebase) {
+	public static Pose2d getNearestReefLocation(CommandSwerveDrivetrain drivebase, ReefSide reefSide) {
 		boolean isBlue = RobotBase.isReal() && DriverStation.getAlliance().get().equals(Alliance.Blue); // default to red alliance in the Sim
 
 		Translation2d reef = isBlue ? blueReef : redReef;
@@ -94,11 +90,11 @@ public class OTFPathFinding {
 				distFromReef.in(Meters) * Math.cos(clampedAngle.in(Radians)),
 				distFromReef.in(Meters) * Math.sin(clampedAngle.in(Radians)));
 
-		Translation2d tangentLeft = new Translation2d(
+		Translation2d tangentRight = new Translation2d(
 				distTangent.in(Meters) * -Math.sin(clampedAngle.in(Radians)),
 				distTangent.in(Meters) * Math.cos(clampedAngle.in(Radians))
 		);
-		Translation2d tangentRight = tangentLeft.times(-1);
+		Translation2d tangentLeft = tangentRight.times(-1);
 
 		Pose2d poseLeft = new Pose2d(
 				reef.plus(translationFromReef).plus(tangentLeft),
@@ -109,62 +105,19 @@ public class OTFPathFinding {
 				new Rotation2d(clampedAngle).rotateBy(Rotation2d.fromDegrees(180))
 		);
 
-		return drivebase.getPose().nearest(List.of(poseLeft, poseRight));
+		switch (reefSide) {
+			case LEFT -> {
+				return poseLeft;
+			}
+			case RIGHT -> {
+				return poseRight;
+			}
+			default -> {
+				return drivebase.getPose().nearest(List.of(poseLeft, poseRight));
+			}
+		}
 	}
 
-	/**
-	 * Finds the nearest branch location based on the current pose of the drivebase.
-	 *
-	 * @param drivebase The swerve subsystem
-	 * @param isLeftBranch A boolean indicating whether to find the left branch (true) or right branch (false)
-	 * @return The nearest branch location as a Pose2d object
-	 */
-	public static Pose2d getNearestReefLocation(CommandSwerveDrivetrain drivebase, boolean isLeftBranch) {
-		boolean isBlue = RobotBase.isReal() && DriverStation.getAlliance().get().equals(Alliance.Blue);
-		Translation2d reef = isBlue ? blueReef : redReef;
-		Pose2d currentPose = drivebase.getPose();
-		Distance distFromReef = Centimeters.of(44.5).plus(Inches.of(32.75)).plus(Inches.of(0 /* Arbitrary */));
-		Distance distTangent = Inches.of(6.5).plus(Inches.of(0 /*Arbitrary */)); // 12.93775566 / 2
-
-		// Find the angle to the reef and clamp it to the nearest 60 degrees
-		Angle angleToReef = Rotations.of(drivebase.getPose().getTranslation().minus(reef).getAngle().getRotations());
-		Angle clampedAngle = Rotations.of(Math.round(angleToReef.in(Rotations) * 6.0) / 6.0);
-
-		// Find the translation from the reef
-		Translation2d translationFromReef = new Translation2d(
-				distFromReef.in(Meters) * Math.cos(clampedAngle.in(Radians)),
-				distFromReef.in(Meters) * Math.sin(clampedAngle.in(Radians)));
-
-		// Find the tangent for the specified branch
-		Translation2d tangent = new Translation2d(
-				distTangent.in(Meters) * (isLeftBranch ? Math.sin(clampedAngle.in(Radians)) : -Math.sin(clampedAngle.in(Radians))),
-				distTangent.in(Meters) * (isLeftBranch ? -Math.cos(clampedAngle.in(Radians)) : Math.cos(clampedAngle.in(Radians))));
-		Pose2d pose = new Pose2d(
-				reef.plus(translationFromReef).plus(tangent),
-				new Rotation2d(clampedAngle).rotateBy(Rotation2d.fromDegrees(180))
-		);
-		return currentPose.nearest(List.of(pose));
-	}
-
-	/**
-	 * Finds the nearest left branch location based on the current pose of the drivebase.
-	 *
-	 * @param drivebase The swerve subsystem
-	 * @return The nearest left branch location as a Pose2d object
-	 */
-	public static Pose2d getNearestLeftBranch(CommandSwerveDrivetrain drivebase) {
-		return getNearestReefLocation(drivebase, true);
-	}
-
-	/**
-	 * Finds the nearest right branch location based on the current pose of the drivebase.
-	 *
-	 * @param drivebase The swerve subsystem
-	 * @return The nearest right branch location as a Pose2d object
-	 */
-	public static Pose2d getNearestRightBranch(CommandSwerveDrivetrain drivebase) {
-		return getNearestReefLocation(drivebase, false);
-	}
 
 	public static Command goToNearestCoralStation(CommandSwerveDrivetrain drivebase) {
 		return new DeferredCommand(
