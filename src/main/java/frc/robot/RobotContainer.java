@@ -9,9 +9,11 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -55,6 +57,7 @@ public class RobotContainer {
 	private final CommandPS5Controller operatorController = new CommandPS5Controller(1);
 
 	private final SendableChooser<Command> autoChooser;
+	private final Field2d field;
 
 	public RobotContainer() {
 
@@ -77,6 +80,19 @@ public class RobotContainer {
 
 		configureBindings();
 
+		field = new Field2d();
+		SmartDashboard.putData("Field", field);
+		// Logging callback for target robot pose
+		PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
+			// Do whatever you want with the pose here
+			field.getObject("target pose").setPose(pose);
+		});
+		// Logging callback for the active path, this is sent as a list of poses
+		PathPlannerLogging.setLogActivePathCallback((poses) -> {
+			// Do whatever you want with the poses here
+			field.getObject("path").setPoses(poses);
+		});
+
 	}
 
 	private void namedCommands() {
@@ -85,7 +101,7 @@ public class RobotContainer {
 		NamedCommands.registerCommand("L4 Elevator Setpoint", ArmElevatorFactory.scoreCoralElevatorSetpoint(elevator, arm, ElevatorPosition.L4).andThen(new WaitCommand(.05)));
 
 		NamedCommands.registerCommand("L2", ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L2));
-		NamedCommands.registerCommand("Elevator Ground", elevator.setElevatorPosition(ElevatorPosition.INTAKE).andThen(arm.setArmAngle(ArmSubsystem.ScoringPosition.IntakeCoralStation)));
+		NamedCommands.registerCommand("Elevator Ground", elevator.setElevatorPosition(ElevatorPosition.INTAKE).andThen(arm.setArmAngle(ArmSubsystem.ScoringPosition.INTAKE)));
 
 		NamedCommands.registerCommand("Outtake", new OuttakeCommand(arm));
 		NamedCommands.registerCommand("1s Outtake", new OuttakeCommand(arm).withTimeout(Seconds.of(0.8)));
@@ -94,7 +110,7 @@ public class RobotContainer {
 
 		NamedCommands.registerCommand("intakeCoral", ArmElevatorFactory.intakeCoral(elevator, arm));
 		NamedCommands.registerCommand("Spin Intake", arm.spinIntakeCommand());
-		NamedCommands.registerCommand("Flick Outtake", arm.setArmAngle(ArmSubsystem.ScoringPosition.OuttakeFlick).andThen(new WaitCommand(0.5)));
+		NamedCommands.registerCommand("Flick Outtake", arm.setArmAngle(ArmSubsystem.ScoringPosition.OUTTAKE_FLICK).andThen(new WaitCommand(0.5)));
 		NamedCommands.registerCommand("Ram", drivetrain.applyRequest(() -> driveCentric.withVelocityX(0.6)));
 
 	}
@@ -153,7 +169,7 @@ public class RobotContainer {
 		operatorController.povUp().whileTrue(elevator.setElevatorVoltage(Volts.of(2.0)));
 		operatorController.povLeft().whileTrue(ArmElevatorFactory.intakeCoral(elevator, arm));
 		operatorController.povDown().whileTrue(elevator.setElevatorVoltage(Volts.of(-1)));
-		operatorController.povRight().onTrue(arm.setArmAngle(ArmSubsystem.ScoringPosition.IntakeCoralStation));
+		operatorController.povRight().onTrue(arm.setArmAngle(ArmSubsystem.ScoringPosition.INTAKE));
 
 		operatorController.L2().whileTrue(climb.setClimbVoltage(Volts.of(7)));
 		operatorController.R2().whileTrue(climb.setClimbVoltage(Volts.of(-7)));
@@ -172,6 +188,7 @@ public class RobotContainer {
 		operatorController.square().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L3));
 		operatorController.circle().onTrue(elevator.setElevatorPosition(ElevatorPosition.HOME));
 		operatorController.cross().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L2));
+		operatorController.options().whileTrue(ArmElevatorFactory.intakeCoralGap(elevator, arm));
 
 		drivetrain.registerTelemetry(logger::telemeterize);
 	}

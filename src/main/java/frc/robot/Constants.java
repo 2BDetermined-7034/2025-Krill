@@ -16,7 +16,7 @@ public class Constants {
       
         public static final Time OTF_TIMEOUT = Seconds.of(1.5);
 
-        public static final LinearVelocity GOAL_END_VELOCITY = MetersPerSecond.of(0.7);
+        public static final LinearVelocity GOAL_END_VELOCITY = MetersPerSecond.of(0.2);
     }
 
     public static final class Arm {

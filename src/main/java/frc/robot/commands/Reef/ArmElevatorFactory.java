@@ -5,14 +5,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.commands.Intake.IntakeCommand;
 import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
 
 public class ArmElevatorFactory {
 	public static Command scoreCoral(ElevatorSubsystem elevator, ArmSubsystem arm, ElevatorSubsystem.ElevatorPosition elevatorPosition) {
 		return new ParallelCommandGroup(
 			elevator.setElevatorPosition(elevatorPosition),
-			arm.setArmAngle(ArmSubsystem.ScoringPosition.Outtake)
+			arm.setArmAngle(ArmSubsystem.ScoringPosition.OUTTAKE)
 		);
 	}
 
@@ -26,7 +25,16 @@ public class ArmElevatorFactory {
 		return new ParallelCommandGroup(
 			Commands.print("intakeCoral Starting"),
 			elevator.setElevatorPosition(ElevatorSubsystem.ElevatorPosition.INTAKE),
-			arm.setArmAngle(ArmSubsystem.ScoringPosition.IntakeCoralStation),
+			arm.setArmAngle(ArmSubsystem.ScoringPosition.INTAKE),
+			new IntakeCommand(arm)
+		).andThen(Commands.print("intakeCoral Ended"));
+	}
+
+	public static Command intakeCoralGap(ElevatorSubsystem elevator, ArmSubsystem arm) {
+		return new ParallelCommandGroup(
+			Commands.print("intakeCoral Starting"),
+			elevator.setElevatorPosition(ElevatorSubsystem.ElevatorPosition.INTAKE_GAP),
+			arm.setArmAngle(ArmSubsystem.ScoringPosition.INTAKE_GAP),
 			new IntakeCommand(arm)
 		).andThen(Commands.print("intakeCoral Ended"));
 	}
@@ -41,7 +49,7 @@ public class ArmElevatorFactory {
 	public static Command scoreCoralElevatorSetpoint(ElevatorSubsystem elevator, ArmSubsystem arm, ElevatorSubsystem.ElevatorPosition elevatorPosition) {
 		return new ParallelCommandGroup(
 			elevator.setElevatorPositionSetpoint(elevatorPosition),
-			arm.setArmAngle(ArmSubsystem.ScoringPosition.Outtake)
+			arm.setArmAngle(ArmSubsystem.ScoringPosition.OUTTAKE)
 		);
 	}
 }

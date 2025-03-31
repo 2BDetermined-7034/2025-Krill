@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -346,6 +347,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         addVisionMeasurement(measurement.getRobotPose(), measurement.getTimeStamp(), measurement.getStdDevs());
     }
 
+
     public Pose2d getPose() {
         return super.getState().Pose;
     }
@@ -369,6 +371,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
                 new Pose2d(getPose().getTranslation(), getPathVelocityHeading(getState().Speeds, waypoint)),
                 midpoint, // force rotation at the modpoint
+
                 waypoint
         );
 
@@ -398,7 +401,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 Commands.print("end position PID loop")
         )).finallyDo((interrupt) -> {
             if (interrupt) { //if this is false then the position pid would've X braked & called the same method
-                this.setControl(new SwerveRequest.ApplyRobotSpeeds().withSpeeds(new ChassisSpeeds(0, 0, 0)));
+                this.setControl(new SwerveRequest.SwerveDriveBrake());
             }
         });
     }

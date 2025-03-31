@@ -17,11 +17,11 @@ import java.util.function.Supplier;
 import static edu.wpi.first.units.Units.Rotations;
 
 public class PointAtCoralStation {
-	private static final Rotation2d blueRightCoralStationRot = new Rotation2d(Units.degreesToRadians(233.5));
-	private static final Rotation2d blueLeftCoralStationRot = new Rotation2d(Units.degreesToRadians(-233.5));
+	private static final Rotation2d blueRightCoralStationRot = new Rotation2d(Units.degreesToRadians(234));
+	private static final Rotation2d blueLeftCoralStationRot = new Rotation2d(Units.degreesToRadians(-234));
 
-	private static final Rotation2d redRightCoralStationRot = new Rotation2d(Units.degreesToRadians(-233.5)); //0.91629786
-	private static final Rotation2d redLeftCoralStationRot = new Rotation2d(Units.degreesToRadians(233.5)); //5.32325422
+	private static final Rotation2d redRightCoralStationRot = new Rotation2d(Units.degreesToRadians(-234)); //0.91629786
+	private static final Rotation2d redLeftCoralStationRot = new Rotation2d(Units.degreesToRadians(234)); //5.32325422
 
 
 	public static Command pointAtCoralStation(Supplier<Double> velocityX, Supplier<Double> velocityY, double deadband, CommandSwerveDrivetrain drivetrain) {
@@ -53,7 +53,7 @@ public class PointAtCoralStation {
 				.withVelocityX(velocityX.get())
 				.withVelocityY(velocityY.get())
 				.withTargetDirection(coralStationAngle)
-				.withHeadingPID(10.0, 1.0, 0.0);
+				.withHeadingPID(7, 1.0, 0.0);
 		});
 	}
 }

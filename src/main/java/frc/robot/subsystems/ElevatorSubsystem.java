@@ -28,8 +28,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 		INTAKE(Rotations.of(0.33)),
 		L2(Rotations.of(0.553223)),
 		L3(Rotations.of(1.222168)),
-		L4(Rotations.of(2.24
-		));
+		L4(Rotations.of(2.24)),
+		INTAKE_GAP(Rotations.of(0.0625
+			));
 
 		private final Angle scoringPosition;
 

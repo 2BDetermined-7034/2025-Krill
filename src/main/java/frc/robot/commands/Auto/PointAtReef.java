@@ -35,7 +35,7 @@ public class PointAtReef {
 				.withVelocityX(velocityX.get())
 				.withVelocityY(velocityY.get())
 				.withTargetDirection(clampedAngle)
-				.withHeadingPID(10.0, 1.0, 0.0);
+				.withHeadingPID(7, 1.0, 0.0);
 		});
 	}
 }
