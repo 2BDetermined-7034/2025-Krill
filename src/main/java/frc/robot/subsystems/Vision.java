@@ -60,24 +60,24 @@ public class Vision {
 		FRONT_CAM(
 			"front",
 			new Transform3d(
-				new Translation3d(Meters.of(0.355), Meters.of(0), Meters.of(0.18)),
-				new Rotation3d(Degrees.of(0), Degrees.of(-9.0), Degrees.of(0))
+				new Translation3d(Meters.of((0.355-0.025)), Meters.of(0), Meters.of(0.175)),
+				new Rotation3d(Degrees.of(0), Degrees.of(-9.3), Degrees.of(0))
 			),
 			PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-			VecBuilder.fill(3, 3, 0.5),
-			VecBuilder.fill(1.5, 1.5, 0.5)
-		),
-
-		BACK_CAM(
-			"back",
-				new Transform3d(
-				new Translation3d(Meters.of(-0.355), Meters.of(0), Meters.of(0.19)),
-				new Rotation3d(Degrees.of(0), Degrees.of(-25.0), Degrees.of(180.0))
-			),
-			PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-			VecBuilder.fill(4.0, 4.0, 1.0),
-			VecBuilder.fill(3.0, 3.0, 1.0)
+			VecBuilder.fill(3, 3, 0.7),
+			VecBuilder.fill(0.5, 0.5, 0.7)
 		);
+
+//		BACK_CAM(
+//			"back",
+//			new Transform3d(
+//				new Translation3d(Meters.of(-0.355), Meters.of(0), Meters.of(0.1875)),
+//				new Rotation3d(Degrees.of(0), Degrees.of(-19), Degrees.of(180.0))
+//			),
+//			PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+//			VecBuilder.fill(3, 3, 0.5),
+//			VecBuilder.fill(0.5, 0.5, 0.5)
+//		);
 
 
 		private final PhotonCamera photonCamera;
@@ -204,7 +204,7 @@ public class Vision {
 			if (numTags == 1 && avgDistance > 4) {
 				estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
 			} else {
-				estStdDevs = estStdDevs.times(1 + (avgDistance * avgDistance / 30));
+				estStdDevs = estStdDevs.times(1 + (avgDistance / 30));
 			}
 			curStdDevs = estStdDevs;
 

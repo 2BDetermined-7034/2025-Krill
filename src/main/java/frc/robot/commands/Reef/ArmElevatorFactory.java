@@ -5,34 +5,51 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.commands.Intake.IntakeCommand;
 import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsystem;
 
 public class ArmElevatorFactory {
-	public static Command scoreCoral(CommandSwerveDrivetrain swerveDrivetrain, ElevatorSubsystem elevator, ArmSubsystem arm, ElevatorSubsystem.ElevatorPosition elevatorPosition) {
+	public static Command scoreCoral(ElevatorSubsystem elevator, ArmSubsystem arm, ElevatorSubsystem.ElevatorPosition elevatorPosition) {
 		return new ParallelCommandGroup(
-			Commands.print("Command Starting"),
 			elevator.setElevatorPosition(elevatorPosition),
-			arm.setArmAngle(ArmSubsystem.ScoringPosition.Outtake)
-			//OTFPathFinding.goToNearestReef(swerveDrivetrain)
+			arm.setArmAngle(ArmSubsystem.ScoringPosition.OUTTAKE)
 		);
 	}
 
+	/**
+	 *
+	 * @param elevator
+	 * @param arm
+	 * @return
+	 */
 	public static Command intakeCoral(ElevatorSubsystem elevator, ArmSubsystem arm) {
 		return new ParallelCommandGroup(
 			Commands.print("intakeCoral Starting"),
 			elevator.setElevatorPosition(ElevatorSubsystem.ElevatorPosition.INTAKE),
-			arm.setArmAngle(ArmSubsystem.ScoringPosition.IntakeCoralStation),
+			arm.setArmAngle(ArmSubsystem.ScoringPosition.INTAKE),
 			new IntakeCommand(arm)
 		).andThen(Commands.print("intakeCoral Ended"));
 	}
 
-	public static Command scoreCoralTempAuto(CommandSwerveDrivetrain swerveDrivetrain, ElevatorSubsystem elevator, ArmSubsystem arm, ElevatorSubsystem.ElevatorPosition elevatorPosition) {
+	public static Command intakeCoralGap(ElevatorSubsystem elevator, ArmSubsystem arm) {
 		return new ParallelCommandGroup(
-			Commands.print("Command Starting"),
-			elevator.setElevatorPosition(elevatorPosition),
-			arm.setArmAngle(ArmSubsystem.ScoringPosition.OuttakeTempAuto)
-			//OTFPathFinding.goToNearestReef(swerveDrivetrain)
+			Commands.print("intakeCoral Starting"),
+			elevator.setElevatorPosition(ElevatorSubsystem.ElevatorPosition.INTAKE_GAP),
+			arm.setArmAngle(ArmSubsystem.ScoringPosition.INTAKE_GAP),
+			new IntakeCommand(arm)
+		).andThen(Commands.print("intakeCoral Ended"));
+	}
+
+	/**
+	 * Same thing as score coral but waits for elevator to reach setpoint
+	 * @param elevator
+	 * @param arm
+	 * @param elevatorPosition
+	 * @return
+	 */
+	public static Command scoreCoralElevatorSetpoint(ElevatorSubsystem elevator, ArmSubsystem arm, ElevatorSubsystem.ElevatorPosition elevatorPosition) {
+		return new ParallelCommandGroup(
+			elevator.setElevatorPositionSetpoint(elevatorPosition),
+			arm.setArmAngle(ArmSubsystem.ScoringPosition.OUTTAKE)
 		);
 	}
 }

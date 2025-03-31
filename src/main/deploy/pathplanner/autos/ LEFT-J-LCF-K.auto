@@ -17,7 +17,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "MID-G"
+                  "pathName": "LEFT-J"
                 }
               }
             ]
@@ -30,20 +30,32 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Flick Outtake"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "J-LCF"
+                }
+              },
               {
                 "type": "named",
                 "data": {
                   "name": "intakeCoral"
                 }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "G-RC"
-                }
               }
             ]
           }
@@ -51,38 +63,25 @@
         {
           "type": "named",
           "data": {
-            "name": "1s Drive Forward"
+            "name": "L4"
           }
         },
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "L4"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "RC-B "
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Spin Intake"
-                }
-              }
-            ]
+            "pathName": "LCF-K"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "1s Outtake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Flick Outtake"
           }
         }
       ]

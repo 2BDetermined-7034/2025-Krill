@@ -10,24 +10,29 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.GoalEndState;
-import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.IdealStartingState;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.generated.TunerConstants;
+import frc.robot.commands.Auto.PathfindHolonomicPID;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.subsystems.vision.VisionPoseMeasurement;
 
@@ -35,6 +40,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.DrivebaseOnTheFly.*;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -85,6 +91,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     this
             )
     );
+    /* The SysId routine to test */
+    private final SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineSteer;
     /*
      * SysId routine for characterizing rotation.
      * This is used to find PID gains for the FieldCentricFacingAngle HeadingController.
@@ -111,8 +119,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     this
             )
     );
-    /* The SysId routine to test */
-    private final SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineSteer;
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
     /* Keep track if we've ever applied the operator perspective before or not */
@@ -230,7 +236,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
 
-
     @Override
     public void periodic() {
         var measurements = vision.getVisionPoseMeasurements();
@@ -290,7 +295,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     ),
                     new PPHolonomicDriveController(
                             // PID constants for translation
-                            new PIDConstants(14, 0, 0),
+                            new PIDConstants(10, 0, 0),
                             // PID constants for rotation
                             new PIDConstants(7, 0, 0)
                     ),
@@ -342,41 +347,93 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         addVisionMeasurement(measurement.getRobotPose(), measurement.getTimeStamp(), measurement.getStdDevs());
     }
 
-    public Command driveToPose(Pose2d pose) {
-        // Create the constraints to use while pathfinding
-        PathConstraints constraints = new PathConstraints(
-                TunerConstants.kSpeedAt12Volts, MetersPerSecondPerSecond.of(3),
-                DegreesPerSecond.of(540), DegreesPerSecondPerSecond.of(720));
-
-        // Since AutoBuilder is configured, we can use it to build pathfinding commands
-        return AutoBuilder.pathfindToPose(
-                pose,
-                constraints,
-                MetersPerSecond.of(0.0) // Goal end velocity in meters/sec
-        ).andThen(() -> SmartDashboard.putBoolean("Pathfind finished", true));
-    }
-
-    public Command driveToPose(List<Pose2d> poses) {
-        List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(poses);
-        // Create the constraints to use while pathfinding
-        PathConstraints constraints = new PathConstraints(
-            TunerConstants.kSpeedAt12Volts, MetersPerSecondPerSecond.of(2.5),
-            DegreesPerSecond.of(540), DegreesPerSecondPerSecond.of(540));
-
-        // Since AutoBuilder is configured, we can use it to build pathfinding commands
-        PathPlannerPath path = new PathPlannerPath(
-            waypoints,
-            constraints,
-            null,
-            new GoalEndState(0.0, poses.get(poses.size()-1).getRotation()) // Goal end velocity in meters/sec
-        );
-        path.preventFlipping = true;
-
-
-		return AutoBuilder.followPath(path);
-	}
 
     public Pose2d getPose() {
         return super.getState().Pose;
     }
+
+    public Angle getRoll() {
+        return super.getPigeon2().getRoll().getValue();
+    }
+
+    public Angle getPitch() {
+        return super.getPigeon2().getPitch().getValue();
+    }
+
+    public Rotation2d getHeading() {
+        return getPose().getRotation();
+    }
+
+    public Command getPathFromWaypoint(Pose2d waypoint) {
+        Pose2d diff = waypoint.relativeTo(getPose());
+        Pose2d midpoint = getPose().plus(new Transform2d(diff.div(2).getTranslation(),diff.getRotation()));
+
+        List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
+                new Pose2d(getPose().getTranslation(), getPathVelocityHeading(getState().Speeds, waypoint)),
+                midpoint, // force rotation at the modpoint
+
+                waypoint
+        );
+
+        if (waypoints.get(0).anchor().getDistance(waypoints.get(1).anchor()) < 0.01) {
+            return
+                    Commands.sequence(
+                            Commands.print("start position PID loop"),
+                            PathfindHolonomicPID.generateCommand(this, () -> waypoint, OTF_TIMEOUT),
+                            Commands.print("end position PID loop")
+                    );
+        }
+
+        PathPlannerPath path = new PathPlannerPath(
+                waypoints,
+                OTF_CONSTRAINTS,
+                new IdealStartingState(getVelocityMagnitude(getState().Speeds), getHeading()),
+                new GoalEndState(GOAL_END_VELOCITY, waypoint.getRotation())
+        );
+
+        path.preventFlipping = true;
+
+        return (AutoBuilder.followPath(path).andThen(
+                Commands.print("start position PID loop"),
+                PathfindHolonomicPID.generateCommand(this, () -> waypoint, (
+                                OTF_TIMEOUT
+                        )),
+                Commands.print("end position PID loop")
+        )).finallyDo((interrupt) -> {
+            if (interrupt) { //if this is false then the position pid would've X braked & called the same method
+                this.setControl(new SwerveRequest.SwerveDriveBrake());
+            }
+        });
+    }
+
+    /**
+     *
+     * @param cs field relative chassis speeds
+     * @param target setpoint pose
+     * @return
+     */
+    private Rotation2d getPathVelocityHeading(ChassisSpeeds cs, Pose2d target) {
+        if (getVelocityMagnitude(cs).in(MetersPerSecond) < 0.25) {
+            System.out.println("approach: straight line");
+            var diff = target.getTranslation().minus(getPose().getTranslation());
+            System.out.println("diff calc: \nx: " + diff.getX() + "\ny: " + diff.getY() + "\nDoT: " + diff.getAngle().getDegrees());
+            return (diff.getNorm() < 0.01) ? target.getRotation() : diff.getAngle();//.rotateBy(Rotation2d.k180deg);
+        }
+        System.out.println("approach: compensating for velocity");
+        var rotation = new Rotation2d(cs.vxMetersPerSecond, cs.vyMetersPerSecond);
+
+        System.out.println("velocity calc: \nx: " + cs.vxMetersPerSecond + "\ny: " + cs.vyMetersPerSecond + "\nDoT: " + rotation);
+        return rotation;
+    }
+
+    /**
+     * Returns the velocity magnitude of the chassis speeds vector
+     * @param cs the ChassisSpeeds
+     * @return the magnitude as a {@link LinearVelocity}
+     */
+    public LinearVelocity getVelocityMagnitude(ChassisSpeeds cs) {
+        return MetersPerSecond.of(new Translation2d(cs.vxMetersPerSecond, cs.vyMetersPerSecond).getNorm());
+    }
+
+
 }

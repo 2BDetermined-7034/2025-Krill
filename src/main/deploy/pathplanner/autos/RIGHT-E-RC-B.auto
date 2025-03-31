@@ -5,7 +5,7 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "sequential",
           "data": {
             "commands": [
               {
@@ -36,12 +36,6 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "Elevator Ground"
@@ -54,7 +48,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "E-RC"
+                  "pathName": "E-RCF"
                 }
               }
             ]
@@ -67,22 +61,15 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "L4"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "RC-B "
-                }
-              }
-            ]
+            "name": "L4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RCF-D"
           }
         },
         {
