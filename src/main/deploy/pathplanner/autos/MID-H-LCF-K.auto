@@ -17,7 +17,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "MID-G"
+                  "pathName": "MID-H"
                 }
               }
             ]
@@ -26,11 +26,11 @@
         {
           "type": "named",
           "data": {
-            "name": "1s Outtake"
+            "name": "0.3s Outtake"
           }
         },
         {
-          "type": "parallel",
+          "type": "deadline",
           "data": {
             "commands": [
               {
@@ -40,49 +40,37 @@
                 }
               },
               {
-                "type": "path",
+                "type": "sequential",
                 "data": {
-                  "pathName": "G-RC"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "H-LCF"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Ram"
+                      }
+                    }
+                  ]
                 }
               }
             ]
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "1s Drive Forward"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "L4"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "RC-B "
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Spin Intake"
-                }
-              }
-            ]
+            "pathName": "LCF-K"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "1s Outtake"
+            "name": "0.3s Outtake"
           }
         }
       ]

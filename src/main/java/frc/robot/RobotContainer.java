@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.Auto.OTFPathFinding;
 import frc.robot.commands.Auto.PointAtCoralStation;
 import frc.robot.commands.Auto.PointAtReef;
@@ -61,9 +62,9 @@ public class RobotContainer {
 
 	public RobotContainer() {
 
+
 		namedCommands();
 		boolean isCompetition = false;
-
 		// Build an auto chooser. This will use Commands.none() as the default option.
 		// As an example, this will only show autos that start with "comp" while at
 		// competition as defined by the programmer
@@ -92,7 +93,6 @@ public class RobotContainer {
 			// Do whatever you want with the poses here
 			field.getObject("path").setPoses(poses);
 		});
-
 	}
 
 	private void namedCommands() {
@@ -140,31 +140,19 @@ public class RobotContainer {
 			drivetrain
 		));
 
-//		driverController.options().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+		driverController.options().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
-//		driverController.square().whileTrue(OTFPathFinding.goToNearestReef(drivetrain));
 		driverController.square().whileTrue(OTFPathFinding.goToNearestReef(drivetrain, OTFPathFinding.ReefSide.LEFT));
 		driverController.circle().whileTrue(OTFPathFinding.goToNearestReef(drivetrain, OTFPathFinding.ReefSide.RIGHT));
 
 		driverController.triangle().whileTrue(OTFPathFinding.goToNearestCoralStation(drivetrain));
 		driverController.PS().whileTrue(arm.zero());
-//
-//
-
-
-//		for (int i = 0; i < 360; i += 45) {
-//			final double angle = (i / -180.0f) * Math.PI;
-//			driverController.pov(i).whileTrue(drivetrain.applyRequest(() ->
-//				driveCentric.withVelocityX(Math.cos(angle) * 0.4 + 0.1).withVelocityY(Math.sin(angle) * 0.5)
-//			));
-//		}
 
 		driverController.povUp().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(0.5).withVelocityY(0)));
 		driverController.povDown().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(-0.5).withVelocityY(0)));
 		driverController.povLeft().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(0.1).withVelocityY(0.5)));
 		driverController.povRight().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(0.1).withVelocityY(-0.5)));
 
-		drivetrain.resetPose(new Pose2d(new Translation2d(13.91, 3.14), new Rotation2d(128.17)));
 
 		operatorController.povUp().whileTrue(elevator.setElevatorVoltage(Volts.of(2.0)));
 		operatorController.povLeft().whileTrue(ArmElevatorFactory.intakeCoral(elevator, arm));
@@ -190,6 +178,20 @@ public class RobotContainer {
 		operatorController.cross().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L2));
 		operatorController.options().whileTrue(ArmElevatorFactory.intakeCoralGap(elevator, arm));
 
+		// Drivebase Tip Detection.
+		new Trigger(() -> {
+
+			double pitch = Math.abs(drivetrain.getPitch().in(Degrees));
+			pitch = Math.min(pitch, 180 - pitch);
+
+			double roll = Math.abs(drivetrain.getRoll().in(Degrees));
+			roll = Math.min(roll, 180 - roll);
+
+			return pitch > Constants.Elevator.AUTO_RETRACT_THRESHOLD.in(Degrees)
+				|| roll > Constants.Elevator.AUTO_RETRACT_THRESHOLD.in(Degrees);
+		}
+		).onTrue(elevator.setElevatorPosition(ElevatorPosition.HOME));
+//
 		drivetrain.registerTelemetry(logger::telemeterize);
 	}
 

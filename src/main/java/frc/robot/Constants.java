@@ -43,6 +43,9 @@ public class Constants {
 
         public static final Current CURRENT_LIMIT = Amps.of(80.0);
 
+        public static final Angle AUTO_RETRACT_THRESHOLD = Degrees.of(10);
+
+
     }
 
     public static final class Climb {
