@@ -48,13 +48,11 @@ public class RobotContainer {
 	//private final CommandXboxController joystick = new CommandXboxController(0);
 	private final CommandPS5Controller driverController = new CommandPS5Controller(0);
 	private final CommandPS5Controller operatorController = new CommandPS5Controller(1);
-	private final LED led = new LED();
+	private final LEDSubsystem ledSubsystem = new LEDSubsystem();
 
 	private final SendableChooser<Command> autoChooser;
 
 	public RobotContainer() {
-
-		led.runPattern(LEDPattern.progressMaskLayer(() -> elevator.getElevatorAngle().in(Rotations) / 2.5), LEDPattern.progressMaskLayer(() -> elevator.getElevatorAngle().in(Rotations) / 2.5));
 
 		NamedCommands.registerCommand("L4", ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L4));
 		NamedCommands.registerCommand("L2", ArmElevatorFactory.scoreCoral(drivetrain, elevator, arm, ElevatorPosition.L2));
