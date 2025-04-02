@@ -9,11 +9,6 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.util.PathPlannerLogging;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -58,7 +53,6 @@ public class RobotContainer {
 	private final CommandPS5Controller operatorController = new CommandPS5Controller(1);
 
 	private final SendableChooser<Command> autoChooser;
-	private final Field2d field;
 
 	public RobotContainer() {
 
@@ -81,18 +75,7 @@ public class RobotContainer {
 
 		configureBindings();
 
-		field = new Field2d();
-		SmartDashboard.putData("Field", field);
-		// Logging callback for target robot pose
-		PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
-			// Do whatever you want with the pose here
-			field.getObject("target pose").setPose(pose);
-		});
-		// Logging callback for the active path, this is sent as a list of poses
-		PathPlannerLogging.setLogActivePathCallback((poses) -> {
-			// Do whatever you want with the poses here
-			field.getObject("path").setPoses(poses);
-		});
+
 	}
 
 	private void namedCommands() {
@@ -171,12 +154,12 @@ public class RobotContainer {
 		operatorController.L1().whileTrue(new OuttakeCommand(arm));
 
 
-		operatorController.povRight().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L1));
+		operatorController.options().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L1));
 		operatorController.triangle().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L4));
 		operatorController.square().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L3));
 		operatorController.circle().onTrue(elevator.setElevatorPosition(ElevatorPosition.HOME));
 		operatorController.cross().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L2));
-		operatorController.options().whileTrue(ArmElevatorFactory.intakeCoralGap(elevator, arm));
+		operatorController.povRight().whileTrue(ArmElevatorFactory.intakeCoralGap(elevator, arm));
 
 		// Drivebase Tip Detection.
 		new Trigger(() -> {
