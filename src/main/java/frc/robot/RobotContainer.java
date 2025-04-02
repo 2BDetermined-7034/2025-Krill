@@ -157,7 +157,7 @@ public class RobotContainer {
 		operatorController.povUp().whileTrue(elevator.setElevatorVoltage(Volts.of(2.0)));
 		operatorController.povLeft().whileTrue(ArmElevatorFactory.intakeCoral(elevator, arm));
 		operatorController.povDown().whileTrue(elevator.setElevatorVoltage(Volts.of(-1)));
-		operatorController.povRight().onTrue(arm.setArmAngle(ArmSubsystem.ScoringPosition.INTAKE));
+		operatorController.create().onTrue(arm.setArmAngle(ArmSubsystem.ScoringPosition.INTAKE));
 
 		operatorController.L2().whileTrue(climb.setClimbVoltage(Volts.of(7)));
 		operatorController.R2().whileTrue(climb.setClimbVoltage(Volts.of(-7)));
@@ -171,7 +171,7 @@ public class RobotContainer {
 		operatorController.L1().whileTrue(new OuttakeCommand(arm));
 
 
-		operatorController.options().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L1));
+		operatorController.povRight().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L1));
 		operatorController.triangle().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L4));
 		operatorController.square().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L3));
 		operatorController.circle().onTrue(elevator.setElevatorPosition(ElevatorPosition.HOME));
