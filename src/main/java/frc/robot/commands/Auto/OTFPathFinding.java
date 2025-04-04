@@ -90,7 +90,7 @@ public class OTFPathFinding {
 	 * @return The nearest branch location as a Pose2d object
 	 */
 	public static Pose2d getNearestReefLocation(CommandSwerveDrivetrain drivebase, ReefSide reefSide) {
-		boolean isBlue = RobotBase.isReal() && DriverStation.getAlliance().get().equals(Alliance.Blue); // default to red alliance in the Sim
+		boolean isBlue = DriverStation.getAlliance().get().equals(Alliance.Blue); // default to red alliance in the Sim
 
 		Translation2d reef = isBlue ? blueReef : redReef;
 

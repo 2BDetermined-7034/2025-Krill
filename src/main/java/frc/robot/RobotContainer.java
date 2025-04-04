@@ -139,7 +139,7 @@ public class RobotContainer {
 
 
 		operatorController.povUp().whileTrue(elevator.setElevatorVoltage(Volts.of(2.0)));
-		operatorController.povLeft().whileTrue(ArmElevatorFactory.intakeCoral(elevator, arm));
+		operatorController.povLeft().whileTrue(ArmElevatorFactory.intakeCoralVoltage(elevator, arm));
 		operatorController.povDown().whileTrue(elevator.setElevatorVoltage(Volts.of(-1)));
 		operatorController.create().onTrue(arm.setArmAngle(ArmSubsystem.ScoringPosition.INTAKE));
 
@@ -160,7 +160,7 @@ public class RobotContainer {
 		operatorController.square().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L3));
 		operatorController.circle().onTrue(elevator.setElevatorPosition(ElevatorPosition.HOME));
 		operatorController.cross().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L2));
-		operatorController.povRight().whileTrue(ArmElevatorFactory.intakeCoralGap(elevator, arm));
+		operatorController.povRight().whileTrue(ArmElevatorFactory.intakeCoralGapVoltage(elevator, arm));
 
 		// Drivebase Tip Detection.
 		new Trigger(() -> {

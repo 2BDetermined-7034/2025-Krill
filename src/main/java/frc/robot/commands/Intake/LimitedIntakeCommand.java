@@ -1,33 +1,28 @@
 package frc.robot.commands.Intake;
 
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
-import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ArmSubsystem;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.Arm.INTAKE_CURRENT;
-import static frc.robot.Constants.Arm.INTAKE_SPEED;
 
-public class ControlledIntakeCommand extends Command {
+public class LimitedIntakeCommand extends Command {
 	private final ArmSubsystem arm;
 	private boolean overcameInitial;
 	private long time;
 
-	public ControlledIntakeCommand(ArmSubsystem arm) {
+	public LimitedIntakeCommand(ArmSubsystem arm) {
 		this.arm = arm;
 	}
 
 	@Override
 	public void initialize() {
 		overcameInitial = false;
-		arm.getIntakeMotor().setControl(new VelocityTorqueCurrentFOC(INTAKE_SPEED));
+		arm.getIntakeMotor().setControl(new TorqueCurrentFOC(INTAKE_CURRENT));
 		time = 0L;
 	}
 

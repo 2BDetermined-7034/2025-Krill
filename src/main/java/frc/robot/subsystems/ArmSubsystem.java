@@ -9,6 +9,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -78,6 +79,18 @@ public class ArmSubsystem extends SubsystemBase {
 		ccConfig.MagnetSensor.MagnetOffset = CANCODER_OFFSET + HOME_POSITION.in(Rotations);
 		ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
 		canCoder.getConfigurator().apply(ccConfig);
+
+		TalonFXConfiguration configuration = new TalonFXConfiguration();
+		Slot0Configs slotConfig = configuration.Slot0;
+		slotConfig.kS = 0.0;
+		slotConfig.kV = 0.0;
+		slotConfig.kA = 0.0;
+		slotConfig.kG = 0.0;
+		slotConfig.kP = INTAKE_CURRENT.in(Amps) / INTAKE_SPEED.in(RotationsPerSecond);
+		slotConfig.kI = 0.0;
+		slotConfig.kD = 0.0;
+
+		intakeMotor.getConfigurator().apply(configuration);
 
 //		armMotor.setPosition(HOME_POSITION);
 
