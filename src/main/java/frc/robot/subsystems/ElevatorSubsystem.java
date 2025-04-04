@@ -111,7 +111,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 		var ccConfig = new CANcoderConfiguration();
 		ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-		ccConfig.MagnetSensor.MagnetOffset = -0.296142578125;
+		ccConfig.MagnetSensor.MagnetOffset = -0.3310546875;
 		canCoder.getConfigurator().apply(ccConfig);
 
 		new Trigger(DriverStation::isEnabled).onTrue(Commands.runOnce(() -> masterMotor.setControl(new CoastOut())));

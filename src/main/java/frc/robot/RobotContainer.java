@@ -9,8 +9,10 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -22,10 +24,7 @@ import frc.robot.commands.Intake.IntakeCommand;
 import frc.robot.commands.Intake.OuttakeCommand;
 import frc.robot.commands.Reef.ArmElevatorFactory;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.ClimbSubsystem;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.*;
 import frc.robot.subsystems.ElevatorSubsystem.ElevatorPosition;
 
 import static edu.wpi.first.units.Units.*;
@@ -53,6 +52,7 @@ public class RobotContainer {
 	private final CommandPS5Controller operatorController = new CommandPS5Controller(1);
 
 	private final SendableChooser<Command> autoChooser;
+//	private final LEDSubsystem led = new LEDSubsystem();
 
 	public RobotContainer() {
 
@@ -109,6 +109,7 @@ public class RobotContainer {
 					.withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
 			)
 		);
+
 
 		driverController.L1().whileTrue(PointAtReef.pointAtReef(
 			() -> driverController.getLeftY() * MaxSpeed * -0.75,
