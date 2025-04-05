@@ -8,12 +8,22 @@ import frc.robot.commands.Intake.VoltageIntakeCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 
+import static edu.wpi.first.units.Units.Rotation;
+
 public class ArmElevatorFactory {
 	public static Command scoreCoral(ElevatorSubsystem elevator, ArmSubsystem arm, ElevatorSubsystem.ElevatorPosition elevatorPosition) {
-		return new ParallelCommandGroup(
-			elevator.setElevatorPosition(elevatorPosition),
-			arm.setArmAngle(ArmSubsystem.ScoringPosition.OUTTAKE)
-		);
+		if(elevatorPosition == ElevatorSubsystem.ElevatorPosition.L1) {
+			return new ParallelCommandGroup(
+				elevator.setElevatorPosition(elevatorPosition),
+				arm.setArmAngle(Rotation.of(0))
+			);
+		} else {
+			return new ParallelCommandGroup(
+				elevator.setElevatorPosition(elevatorPosition),
+				arm.setArmAngle(ArmSubsystem.ScoringPosition.OUTTAKE)
+			);
+		}
+
 	}
 
 	/**
