@@ -57,12 +57,16 @@ public class Constants {
             NEGATIVE
         }
 
+        public static final Voltage CLIMB_VOLTAGE_FORWARD = Volts.of(10.0);
+        public static final Voltage CLIMB_VOLTAGE_BACKWARDS= Volts.of(-10.0);
+
         public enum ClimbPositions {
             CLIMB_HOME(Rotations.of(0)),
-            EXTENDED(Rotations.of(5.4)),
+            EXTENDED(Rotations.of(4.5)),
             RETRACTED(Rotations.of(-3));
 
             private final Angle climbPosition;
+
 
             ClimbPositions(Angle climbPosition) {
                 this.climbPosition = climbPosition;

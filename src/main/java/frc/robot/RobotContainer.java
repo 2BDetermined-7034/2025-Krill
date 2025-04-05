@@ -26,6 +26,7 @@ import frc.robot.commands.Reef.ArmElevatorFactory;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.ElevatorSubsystem.ElevatorPosition;
+import static frc.robot.Constants.Climb.*;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -143,13 +144,13 @@ public class RobotContainer {
 		operatorController.povDown().whileTrue(elevator.setElevatorVoltage(Volts.of(-1)));
 		operatorController.create().onTrue(arm.setArmAngle(ArmSubsystem.ScoringPosition.INTAKE));
 
-		operatorController.L2().whileTrue(climb.setClimbVoltage(Volts.of(7)));
-		operatorController.R2().whileTrue(climb.setClimbVoltage(Volts.of(-7)));
+		operatorController.L2().whileTrue(climb.setClimbVoltage(CLIMB_VOLTAGE_FORWARD));
+		operatorController.R2().whileTrue(climb.setClimbVoltage(CLIMB_VOLTAGE_BACKWARDS));
 
 		operatorController.PS().and(operatorController.L2()).onTrue(
-			climb.climbUntil(Constants.Climb.ClimbDirection.POSITIVE, Constants.Climb.ClimbPositions.EXTENDED, Volts.of(7.0)));
+			climb.climbUntil(Constants.Climb.ClimbDirection.POSITIVE, Constants.Climb.ClimbPositions.EXTENDED, CLIMB_VOLTAGE_FORWARD));
 		operatorController.PS().and(operatorController.R2()).onTrue(
-			climb.climbUntil(Constants.Climb.ClimbDirection.NEGATIVE, Constants.Climb.ClimbPositions.RETRACTED, Volts.of(-7.0)));
+			climb.climbUntil(Constants.Climb.ClimbDirection.NEGATIVE, Constants.Climb.ClimbPositions.RETRACTED, CLIMB_VOLTAGE_BACKWARDS));
 
 		operatorController.R1().whileTrue(new IntakeCommand(arm));
 		operatorController.L1().whileTrue(new OuttakeCommand(arm));
