@@ -87,10 +87,10 @@ public class RobotContainer {
 		NamedCommands.registerCommand("L2", ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L2));
 		NamedCommands.registerCommand("Elevator Ground", elevator.setElevatorPosition(ElevatorPosition.INTAKE).andThen(arm.setArmAngle(ArmSubsystem.ScoringPosition.INTAKE)));
 
-		NamedCommands.registerCommand("Outtake", new OuttakeCommand(arm));
-		NamedCommands.registerCommand("1s Outtake", new OuttakeCommand(arm).withTimeout(Seconds.of(0.8)));
-		NamedCommands.registerCommand("0.5s Outtake", new OuttakeCommand(arm).withTimeout(Seconds.of(0.5)));
-		NamedCommands.registerCommand("0.3s Outtake", new OuttakeCommand(arm).withTimeout(Seconds.of(0.3)));
+		NamedCommands.registerCommand("Outtake", new OuttakeCommand(arm, elevator));
+		NamedCommands.registerCommand("1s Outtake", new OuttakeCommand(arm, elevator).withTimeout(Seconds.of(0.8)));
+		NamedCommands.registerCommand("0.5s Outtake", new OuttakeCommand(arm, elevator).withTimeout(Seconds.of(0.5)));
+		NamedCommands.registerCommand("0.3s Outtake", new OuttakeCommand(arm, elevator).withTimeout(Seconds.of(0.3)));
 
 		NamedCommands.registerCommand("intakeCoral", ArmElevatorFactory.intakeCoral(elevator, arm));
 		NamedCommands.registerCommand("Spin Intake", arm.spinIntakeCommand());
@@ -105,22 +105,22 @@ public class RobotContainer {
 		drivetrain.setDefaultCommand(
 			// Drivetrain will execute this command periodically
 			drivetrain.applyRequest(() ->
-				drive.withVelocityX(driverController.getLeftY() * MaxSpeed * -0.75) // Drive forward with negative Y (forward)
-					.withVelocityY(driverController.getLeftX() * MaxSpeed * -0.75) // Drive left with negative X (left)
+				drive.withVelocityX(driverController.getLeftY() * MaxSpeed * -1) // Drive forward with negative Y (forward)
+					.withVelocityY(driverController.getLeftX() * MaxSpeed * -1) // Drive left with negative X (left)
 					.withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
 			)
 		);
 
 
 		driverController.L1().whileTrue(PointAtReef.pointAtReef(
-			() -> driverController.getLeftY() * MaxSpeed * -0.75,
-			() -> driverController.getLeftX() * MaxSpeed * -0.75,
+			() -> driverController.getLeftY() * MaxSpeed * -1,
+			() -> driverController.getLeftX() * MaxSpeed * -1,
 			MaxSpeed * 0.1,
 			drivetrain
 		));
 		driverController.R1().whileTrue(PointAtCoralStation.pointAtCoralStation(
-			() -> driverController.getLeftY() * MaxSpeed * -0.75,
-			() -> driverController.getLeftX() * MaxSpeed * -0.75,
+			() -> driverController.getLeftY() * MaxSpeed * -1,
+			() -> driverController.getLeftX() * MaxSpeed * -1,
 			MaxSpeed * 0.1,
 			drivetrain
 		));
@@ -133,10 +133,10 @@ public class RobotContainer {
 		driverController.triangle().whileTrue(OTFPathFinding.goToNearestCoralStation(drivetrain));
 		driverController.PS().whileTrue(arm.zero());
 
-		driverController.povUp().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(0.5).withVelocityY(0)));
-		driverController.povDown().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(-0.5).withVelocityY(0)));
-		driverController.povLeft().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(0.1).withVelocityY(0.5)));
-		driverController.povRight().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(0.1).withVelocityY(-0.5)));
+		driverController.povUp().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(0.75).withVelocityY(0)));
+		driverController.povDown().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(-0.75).withVelocityY(0)));
+		driverController.povLeft().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(0.1).withVelocityY(0.75)));
+		driverController.povRight().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(0.1).withVelocityY(-0.75)));
 
 
 		operatorController.povUp().whileTrue(elevator.setElevatorVoltage(Volts.of(2.0)));
@@ -153,7 +153,7 @@ public class RobotContainer {
 			climb.climbUntil(Constants.Climb.ClimbDirection.NEGATIVE, Constants.Climb.ClimbPositions.RETRACTED, CLIMB_VOLTAGE_BACKWARDS));
 
 		operatorController.R1().whileTrue(new IntakeCommand(arm));
-		operatorController.L1().whileTrue(new OuttakeCommand(arm));
+		operatorController.L1().whileTrue(new OuttakeCommand(arm, elevator));
 
 
 		operatorController.options().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L1));
