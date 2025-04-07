@@ -24,13 +24,12 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 	public enum ElevatorPosition {
 		HOME(Rotations.of(0.02)),
-		L1(Rotations.of(0.103027)),
+		L1(Rotations.of(0.0)),
 		INTAKE(Rotations.of(0.33)),
 		L2(Rotations.of(0.553223)),
 		L3(Rotations.of(1.222168)),
 		L4(Rotations.of(2.24)),
-		INTAKE_GAP(Rotations.of(0.0625
-			));
+		INTAKE_GAP(Rotations.of(0.0625));
 
 		private final Angle scoringPosition;
 
@@ -111,7 +110,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 		var ccConfig = new CANcoderConfiguration();
 		ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-		ccConfig.MagnetSensor.MagnetOffset = -0.296142578125;
+		ccConfig.MagnetSensor.MagnetOffset = -0.3310546875;
 		canCoder.getConfigurator().apply(ccConfig);
 
 		new Trigger(DriverStation::isEnabled).onTrue(Commands.runOnce(() -> masterMotor.setControl(new CoastOut())));

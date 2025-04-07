@@ -54,7 +54,6 @@ public class OTFPathFinding {
 	public enum ReefSide {
 		LEFT,
 		RIGHT,
-		NEAREST;
 	}
 
 	// public static Command goToPose(SwerveSubsystem swerve, int scoreLocation) {
@@ -91,7 +90,7 @@ public class OTFPathFinding {
 	 * @return The nearest branch location as a Pose2d object
 	 */
 	public static Pose2d getNearestReefLocation(CommandSwerveDrivetrain drivebase, ReefSide reefSide) {
-		boolean isBlue = RobotBase.isReal() && DriverStation.getAlliance().get().equals(Alliance.Blue); // default to red alliance in the Sim
+		boolean isBlue = DriverStation.getAlliance().get().equals(Alliance.Blue); // default to red alliance in the Sim
 
 		Translation2d reef = isBlue ? blueReef : redReef;
 
@@ -120,16 +119,10 @@ public class OTFPathFinding {
 				new Rotation2d(clampedAngle).rotateBy(Rotation2d.fromDegrees(180))
 		);
 
-		switch (reefSide) {
-			case LEFT -> {
-				return poseLeft;
-			}
-			case RIGHT -> {
-				return poseRight;
-			}
-			default -> {
-				return drivebase.getPose().nearest(List.of(poseLeft, poseRight));
-			}
+		if (drivebase.getPose().getX() > blueReef.getX() && drivebase.getPose().getX() < redReef.getX()) {
+			return reefSide.equals(ReefSide.LEFT) ? poseRight : poseLeft;
+		} else {
+			return reefSide.equals(ReefSide.LEFT) ? poseLeft : poseRight;
 		}
 	}
 

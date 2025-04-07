@@ -1,10 +1,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.path.PathConstraints;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.units.measure.*;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -31,6 +28,8 @@ public class Constants {
         public static final Current ARM_CURRENT_LIMIT = Amps.of(60.0);
         public static final Angle HOME_POSITION = Degrees.of(-24.2);
         public static final Current INTAKE_CURRENT = Amps.of(50);
+        public static final Voltage INTAKE_VOLTAGE = Volts.of(5.0);
+        public static final AngularVelocity INTAKE_SPEED = RotationsPerSecond.of(20);
     }
 
     public static final class Elevator {
@@ -58,12 +57,16 @@ public class Constants {
             NEGATIVE
         }
 
+        public static final Voltage CLIMB_VOLTAGE_FORWARD = Volts.of(10.0);
+        public static final Voltage CLIMB_VOLTAGE_BACKWARDS= Volts.of(-10.0);
+
         public enum ClimbPositions {
             CLIMB_HOME(Rotations.of(0)),
-            EXTENDED(Rotations.of(5.573242)),
+            EXTENDED(Rotations.of(4.5)),
             RETRACTED(Rotations.of(-3));
 
             private final Angle climbPosition;
+
 
             ClimbPositions(Angle climbPosition) {
                 this.climbPosition = climbPosition;

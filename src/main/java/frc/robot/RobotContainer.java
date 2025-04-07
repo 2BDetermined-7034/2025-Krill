@@ -9,8 +9,10 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
@@ -22,11 +24,9 @@ import frc.robot.commands.Intake.IntakeCommand;
 import frc.robot.commands.Intake.OuttakeCommand;
 import frc.robot.commands.Reef.ArmElevatorFactory;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.ClimbSubsystem;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.*;
 import frc.robot.subsystems.ElevatorSubsystem.ElevatorPosition;
+import static frc.robot.Constants.Climb.*;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -53,6 +53,7 @@ public class RobotContainer {
 	private final CommandPS5Controller operatorController = new CommandPS5Controller(1);
 
 	private final SendableChooser<Command> autoChooser;
+//	private final LEDSubsystem led = new LEDSubsystem();
 
 	public RobotContainer() {
 
@@ -110,6 +111,7 @@ public class RobotContainer {
 			)
 		);
 
+
 		driverController.L1().whileTrue(PointAtReef.pointAtReef(
 			() -> driverController.getLeftY() * MaxSpeed * -0.75,
 			() -> driverController.getLeftX() * MaxSpeed * -0.75,
@@ -138,17 +140,17 @@ public class RobotContainer {
 
 
 		operatorController.povUp().whileTrue(elevator.setElevatorVoltage(Volts.of(2.0)));
-		operatorController.povLeft().whileTrue(ArmElevatorFactory.intakeCoral(elevator, arm));
+		operatorController.povLeft().whileTrue(ArmElevatorFactory.intakeCoralVoltage(elevator, arm));
 		operatorController.povDown().whileTrue(elevator.setElevatorVoltage(Volts.of(-1)));
 		operatorController.create().onTrue(arm.setArmAngle(ArmSubsystem.ScoringPosition.INTAKE));
 
-		operatorController.L2().whileTrue(climb.setClimbVoltage(Volts.of(7)));
-		operatorController.R2().whileTrue(climb.setClimbVoltage(Volts.of(-7)));
+		operatorController.L2().whileTrue(climb.setClimbVoltage(CLIMB_VOLTAGE_FORWARD));
+		operatorController.R2().whileTrue(climb.setClimbVoltage(CLIMB_VOLTAGE_BACKWARDS));
 
 		operatorController.PS().and(operatorController.L2()).onTrue(
-			climb.climbUntil(Constants.Climb.ClimbDirection.POSITIVE, Constants.Climb.ClimbPositions.EXTENDED, Volts.of(7.0)));
+			climb.climbUntil(Constants.Climb.ClimbDirection.POSITIVE, Constants.Climb.ClimbPositions.EXTENDED, CLIMB_VOLTAGE_FORWARD));
 		operatorController.PS().and(operatorController.R2()).onTrue(
-			climb.climbUntil(Constants.Climb.ClimbDirection.NEGATIVE, Constants.Climb.ClimbPositions.RETRACTED, Volts.of(-7.0)));
+			climb.climbUntil(Constants.Climb.ClimbDirection.NEGATIVE, Constants.Climb.ClimbPositions.RETRACTED, CLIMB_VOLTAGE_BACKWARDS));
 
 		operatorController.R1().whileTrue(new IntakeCommand(arm));
 		operatorController.L1().whileTrue(new OuttakeCommand(arm));
@@ -159,7 +161,7 @@ public class RobotContainer {
 		operatorController.square().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L3));
 		operatorController.circle().onTrue(elevator.setElevatorPosition(ElevatorPosition.HOME));
 		operatorController.cross().onTrue(ArmElevatorFactory.scoreCoral(elevator, arm, ElevatorPosition.L2));
-		operatorController.povRight().whileTrue(ArmElevatorFactory.intakeCoralGap(elevator, arm));
+		operatorController.povRight().whileTrue(ArmElevatorFactory.intakeCoralGapVoltage(elevator, arm));
 
 		// Drivebase Tip Detection.
 		new Trigger(() -> {
