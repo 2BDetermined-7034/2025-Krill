@@ -57,14 +57,20 @@
                 "data": {
                   "pathName": "LCN-B"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "L4 Elevator Setpoint"
-                }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "0.3s Outtake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Remove Algae"
           }
         }
       ]

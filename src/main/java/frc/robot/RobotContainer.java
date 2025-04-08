@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -91,6 +93,17 @@ public class RobotContainer {
 		NamedCommands.registerCommand("1s Outtake", new OuttakeCommand(arm, elevator).withTimeout(Seconds.of(0.8)));
 		NamedCommands.registerCommand("0.5s Outtake", new OuttakeCommand(arm, elevator).withTimeout(Seconds.of(0.5)));
 		NamedCommands.registerCommand("0.3s Outtake", new OuttakeCommand(arm, elevator).withTimeout(Seconds.of(0.3)));
+		NamedCommands.registerCommand("Remove Algae",
+			new ParallelCommandGroup(
+				arm.setArmAngle(ArmSubsystem.ScoringPosition.OUTTAKE),
+				drivetrain.applyRequest(() -> driveCentric.withVelocityX(-1.0))
+					.withDeadline(elevator.setElevatorPositionSetpoint(ElevatorPosition.L1))
+			)
+			.andThen(drivetrain.applyRequest(() -> driveCentric.withVelocityX(1.0))
+			.andThen(elevator.setElevatorPositionSetpoint(ElevatorPosition.L4)))
+			.andThen(drivetrain.applyRequest(() -> driveCentric.withVelocityX(-1.0)).withTimeout(0.6))
+		);
+
 
 		NamedCommands.registerCommand("intakeCoral", ArmElevatorFactory.intakeCoral(elevator, arm));
 		NamedCommands.registerCommand("Spin Intake", arm.spinIntakeCommand());
