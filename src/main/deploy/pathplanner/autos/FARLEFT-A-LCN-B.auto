@@ -68,9 +68,35 @@
           }
         },
         {
-          "type": "named",
+          "type": "deadline",
           "data": {
-            "name": "Remove Algae"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeCoral"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "B-LCN"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Ram"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         }
       ]

@@ -24,7 +24,7 @@ import static edu.wpi.first.units.Units.*;
 
 public class Vision {
 
-	private static final AprilTagFieldLayout apriltagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+	private static final AprilTagFieldLayout apriltagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
 
 	/**
 	 * Construct a vision singleton
