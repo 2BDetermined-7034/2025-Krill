@@ -5,6 +5,7 @@ import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ArmSubsystem;
 
@@ -16,15 +17,17 @@ public class VoltageIntakeCommand extends Command {
 	private final ArmSubsystem arm;
 	private boolean overcameInitial;
 	private long time;
+	private Voltage voltage;
 
-	public VoltageIntakeCommand(ArmSubsystem arm) {
+	public VoltageIntakeCommand(ArmSubsystem arm, Voltage voltage) {
 		this.arm = arm;
+		this.voltage = voltage;
 	}
 
 	@Override
 	public void initialize() {
 		overcameInitial = false;
-		arm.getIntakeMotor().setControl(new VoltageOut(INTAKE_VOLTAGE));
+		arm.getIntakeMotor().setControl(new VoltageOut(voltage));
 		time = 0L;
 	}
 

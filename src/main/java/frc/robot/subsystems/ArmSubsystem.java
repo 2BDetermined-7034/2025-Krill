@@ -80,17 +80,17 @@ public class ArmSubsystem extends SubsystemBase {
 		ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
 		canCoder.getConfigurator().apply(ccConfig);
 
-		TalonFXConfiguration configuration = new TalonFXConfiguration();
-		Slot0Configs slotConfig = configuration.Slot0;
-		slotConfig.kS = 0.0;
-		slotConfig.kV = 0.0;
-		slotConfig.kA = 0.0;
-		slotConfig.kG = 0.0;
-		slotConfig.kP = INTAKE_CURRENT.in(Amps) / INTAKE_SPEED.in(RotationsPerSecond);
-		slotConfig.kI = 0.0;
-		slotConfig.kD = 0.0;
-
-		intakeMotor.getConfigurator().apply(configuration);
+//		TalonFXConfiguration configuration = new TalonFXConfiguration();
+//		Slot0Configs slotConfig = configuration.Slot0;
+//		slotConfig.kS = 0.0;
+//		slotConfig.kV = 0.0;
+//		slotConfig.kA = 0.0;
+//		slotConfig.kG = 0.0;
+//		slotConfig.kP = INTAKE_CURRENT.in(Amps) / INTAKE_SPEED.in(RotationsPerSecond);
+//		slotConfig.kI = 0.0;
+//		slotConfig.kD = 0.0;
+//
+//		intakeMotor.getConfigurator().apply(configuration);
 
 //		armMotor.setPosition(HOME_POSITION);
 

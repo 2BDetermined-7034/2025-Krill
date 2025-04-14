@@ -29,7 +29,9 @@ public class Constants {
         public static final Angle HOME_POSITION = Degrees.of(-24.2);
         public static final Current INTAKE_CURRENT = Amps.of(50);
         public static final Voltage INTAKE_VOLTAGE = Volts.of(5.0);
-        public static final AngularVelocity INTAKE_SPEED = RotationsPerSecond.of(20);
+        public static final Voltage OUTTAKE_VOLTAGE = Volts.of(-3);
+        public static final Voltage OUTTAKE_VOLTAGE_L1 = Volts.of(-4);
+//        public static final AngularVelocity INTAKE_SPEED = RotationsPerSecond.of(20);
     }
 
     public static final class Elevator {
