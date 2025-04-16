@@ -7,6 +7,7 @@ import com.ctre.phoenix6.signals.*;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -94,6 +95,10 @@ public class ClimbSubsystem extends SubsystemBase {
 
 	public Command climbUntil(Climb.ClimbDirection direction, Climb.ClimbPositions position, Voltage voltage) {
 		return climbUntil(direction, position.getAngle(), voltage);
+	}
+
+	public Command setClimbEncoderPosition(Angle angle) {
+		return Commands.runOnce(() -> climbMotor.setPosition(angle));
 	}
 
 

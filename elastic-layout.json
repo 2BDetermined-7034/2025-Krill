@@ -21,9 +21,9 @@
           },
           {
             "title": "Pose",
-            "x": 256.0,
+            "x": 640.0,
             "y": 0.0,
-            "width": 1024.0,
+            "width": 640.0,
             "height": 512.0,
             "type": "Field",
             "properties": {
@@ -78,6 +78,20 @@
               "topic": "/SmartDashboard/Auto Chooser",
               "period": 0.06,
               "sort_options": false
+            }
+          },
+          {
+            "title": "photonvision1_Port_1184_Output_MJPEG_Server",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 640.0,
+            "height": 512.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/photonvision1_Port_1184_Output_MJPEG_Server",
+              "period": 0.06,
+              "compression": 28,
+              "fps": 60
             }
           }
         ]
