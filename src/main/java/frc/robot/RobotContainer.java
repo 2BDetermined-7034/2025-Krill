@@ -151,6 +151,8 @@ public class RobotContainer {
 		driverController.povLeft().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(0.1).withVelocityY(0.75)));
 		driverController.povRight().whileTrue(drivetrain.applyRequest(() -> driveCentric.withVelocityX(0.1).withVelocityY(-0.75)));
 
+//		driverController.PS().onTrue(climb.setClimbEncoderPosition(Rotations.of(0)));
+
 
 		operatorController.povUp().whileTrue(elevator.setElevatorVoltage(Volts.of(2.0)));
 		operatorController.povLeft().whileTrue(ArmElevatorFactory.intakeCoralVoltage(elevator, arm));

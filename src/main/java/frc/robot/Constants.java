@@ -64,7 +64,7 @@ public class Constants {
 
         public enum ClimbPositions {
             CLIMB_HOME(Rotations.of(0)),
-            EXTENDED(Rotations.of(4.5)),
+            EXTENDED(Rotations.of(5.85498)),
             RETRACTED(Rotations.of(-3));
 
             private final Angle climbPosition;

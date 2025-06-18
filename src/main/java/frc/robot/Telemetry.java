@@ -15,11 +15,13 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Telemetry {
     private final double MaxSpeed;
@@ -124,5 +126,12 @@ public class Telemetry {
             SmartDashboard.putNumber("Module " + i + " position", MathUtil.angleModulus(state.ModuleTargets[i].angle.getRadians()));
             SmartDashboard.putNumber("Module " + i + " target", MathUtil.angleModulus(state.ModulePositions[i].angle.getRadians()));
         }
+
+        /* Telemetrize the active commands */
+        SmartDashboard.putData(CommandScheduler.getInstance());
+
+        /* Telemetrize match info*/
+        SmartDashboard.putNumber("Match Time", Timer.getMatchTime());
+
     }
 }
