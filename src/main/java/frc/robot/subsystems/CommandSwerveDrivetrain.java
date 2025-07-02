@@ -21,6 +21,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -32,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.LimelightHelpers;
 import frc.robot.commands.Auto.PathfindHolonomicPID;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.subsystems.vision.VisionPoseMeasurement;
@@ -238,10 +240,23 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     @Override
     public void periodic() {
-        var measurements = vision.getVisionPoseMeasurements();
-        for (VisionPoseMeasurement poseMeasurement : measurements) {
-            addVisionMeasurement(poseMeasurement);
-        }
+//        var measurements = vision.getVisionPoseMeasurements();
+//        for (VisionPoseMeasurement poseMeasurement : measurements) {
+//            addVisionMeasurement(poseMeasurement);
+//        }
+        var driveState = getState();
+        double headingDeg = driveState.Pose.getRotation().getDegrees();
+        double omegaRps = Units.radiansToRotations(driveState.Speeds.omegaRadiansPerSecond);
+
+        LimelightHelpers.setPipelineIndex("limelight-sevenoh", 0);
+        LimelightHelpers.PoseEstimate poseEstimator = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-sevenoh");
+        addVisionMeasurement(poseEstimator.pose, poseEstimator.timestampSeconds);
+
+//        LimelightHelpers.SetRobotOrientation("limelight", headingDeg, 0, 0, 0, 0, 0);
+//        var llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-sevenoh");
+//        if (llMeasurement != null && llMeasurement.tagCount > 0 && Math.abs(omegaRps) < 2.0) {
+//            addVisionMeasurement(llMeasurement.pose, llMeasurement.timestampSeconds);
+//        }
 
         /*
          * Periodically try to apply the operator perspective.

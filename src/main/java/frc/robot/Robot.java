@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.pathplanner.lib.commands.FollowPathCommand;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -20,7 +21,14 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    CommandScheduler.getInstance().run(); 
+    CommandScheduler.getInstance().run();
+
+    LimelightHelpers.RawFiducial[] targets = LimelightHelpers.getRawFiducials("limelight-sevenoh");
+    double[] ids = new double[targets.length];
+    for(int i = 0; i < ids.length; i++){
+      ids[i] = targets[i].id;
+    }
+    SmartDashboard.putNumberArray("limelight-targets", ids);
   }
 
   @Override
