@@ -291,8 +291,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     // Consumer of ChassisSpeeds and feedforwards to drive the robot
                     (speeds, feedforwards) -> setControl(
                             pathApplyRobotSpeeds.withSpeeds(speeds)
-//                                    .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
-//                                    .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
+                                    .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
+                                    .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
                     ),
                     new PPHolonomicDriveController(
                             // PID constants for translation
